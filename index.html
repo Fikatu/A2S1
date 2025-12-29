@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <title>Grile DAP - Mod Învățare</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <style>
+    :root {
+      --primary: #2f80ed;
+      --primary-dark: #1c60bd;
+      --warning: #f59e0b; /* Culoare pentru butonul de invatare */
+      --warning-dark: #d97706;
+      --bg: #f8fafc;
+      --text: #333;
+      --card-bg: #ffffff;
+      --border: #e0e0e0;
+      --success: #27ae60;
+      --danger: #c0392b;
+      --radius: 12px;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      padding: 30px;
+      max-width: 800px;
+      width: 100%;
+      position: relative;
+      margin-top: 20px;
+      margin-bottom: 40px;
+    }
+
+    .header-stats {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      font-size: 0.95rem;
+      color: #555;
+      background: #f1f5f9;
+      padding: 10px 15px;
+      border-radius: 8px;
+    }
+
+    .score-badge { font-weight: bold; }
+    
+    .question-counter {
+      font-size: 0.9rem;
+      color: #888;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .question p {
+      font-size: 1.25rem;
+      line-height: 1.5;
+      color: var(--text);
+      font-weight: 600;
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: flex;
+      align-items: flex-start;
+      padding: 14px 16px;
+      background: #fff;
+      border: 2px solid #f1f5f9;
+      border-radius: var(--radius);
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    label:hover {
+      background: #f8fafc;
+      border-color: #dbeafe;
+    }
+
+    input[type="checkbox"] {
+      margin-right: 15px;
+      margin-top: 4px;
+      transform: scale(1.3);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* Butoane */
+    .btn-container {
+      display: flex;
+      gap: 10px;
+      margin-top: 30px;
+      flex-wrap: wrap; /* Permite butoanelor să cadă pe rând nou pe mobil */
+    }
+
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 20px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: var(--radius);
+      cursor: pointer;
+      flex: 1;
+      min-width: 150px;
+      transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+    button:hover { background: var(--primary-dark); }
+    button:active { transform: scale(0.98); }
+
+    /* Stil specific pentru butonul de învățare */
+    button#learn-btn {
+      background: var(--warning);
+      color: #fff;
+    }
+    button#learn-btn:hover {
+      background: var(--warning-dark);
+    }
+
+    /* Feedback Vizual */
+    .correct { color: var(--success); font-weight: bold; margin-top: 15px;}
+    .wrong { color: var(--danger); font-weight: bold; margin-top: 15px;}
+    .info { color: var(--warning-dark); font-weight: bold; margin-top: 15px;}
+
+    label.correct-answer {
+      background-color: #d1fae5;
+      border-color: #27ae60;
+      color: #064e3b;
+    }
+
+    label.wrong-answer {
+      background-color: #fee2e2;
+      border-color: #ef4444;
+      animation: shake 0.4s ease;
+    }
+
+    .hidden { display: none !important; }
+
+    /* Progress Bar */
+    .progress-container {
+      width: 100%;
+      max-width: 800px;
+      background: #e2e8f0;
+      height: 8px;
+      border-radius: 100px;
+      overflow: hidden;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 100;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--primary);
+      transition: width 0.3s ease;
+    }
+
+    .result-box { text-align: center; padding: 20px; }
+    .result-score { font-size: 3rem; font-weight: bold; color: var(--primary); margin: 20px 0; }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    @media (max-width: 600px) {
+      .container { padding: 20px; margin-top: 10px; border-radius: 0; box-shadow: none; }
+      .header-stats { flex-direction: column; gap: 5px; text-align: center;}
+      .question p { font-size: 1.1rem; }
+      button { font-size: 15px; padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="progress-container">
+    <div class="progress-fill" id="progress"></div>
+  </div>
+
+  <div class="container">
+    <div class="header-stats">
+       <span>✅ Corecte: <span id="correct-count" class="score-badge" style="color:var(--success)">0</span></span>
+       <span>❌ Greșite: <span id="wrong-count" class="score-badge" style="color:var(--danger)">0</span></span>
+    </div>
+
+    <div id="quiz-area">
+      <div class="question-counter" id="question-counter">Întrebarea 1</div>
+      <div id="question-box" class="question"></div>
+      
+      <div id="feedback"></div>
+
+      <div class="btn-container">
+        <button id="learn-btn" onclick="showCorrectAnswer()">👀 Vezi Răspunsul</button>
+        <button id="submit-btn" onclick="submitAnswer()">Verifică Răspunsul</button>
+        <button id="next-btn" class="hidden" onclick="nextQuestion()">Următoarea ➡</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Setul scurt de întrebări
+    const originalQuestions = [
+      {
+        question: "1. Efectul gândirii în grup:",
+        answers: ["a.	Are avantajul că , dacă problema este complicată și consumă mult timp, un manager impune o anumită soluție membrilor grupului", "b. apare atunci când liderul grupului își exprimă prea devreme opțiunea proprie , în cadrul procesului de evaluare a alternativelor ", "c.	Apare atunci când liderul grupului își exprimă opțiunea proprie , la finalul procesului de evaluare a alternativelor"],
+        correct: [1]
+      },
+      {
+        question: "2.	În procesul decizional, apelarea de către șeful unei organizații publice la o echipă de consultanță din exterior.",
+        answers: ["a.	Marchează un aspect de modernizare în procesul decizional", "b.	Externalizează procesul decizional", "c.	Se poate face în situații bine determinate", "d.	Reprezintă un factor de rezistență la schimbarea în organizație"],
+        correct: [0, 1, 2]
+      },
+      {
+        question:"3.	Controlul realizat de către organele administrative",
+        answers: ["a.	Se suprapune cu controlul de gestiune", "b.	 se diferențiază de controlul de gestiune", "c.	 verifică modul de îndeplinire al deciziilor administrative"],
+        correct: [1, 2]
+      },
+      {
+        question: "4.	Controlul intern specializat ia forma",
+        answers: ["a. controlului ierarhic operativ curent", "b. controlului preventiv", "c. controlului financiar intern"],
+        correct: [0, 1, 2]
+      }
+    ];
+
+    let questions = []; 
+    let correctAnswersCount = 0;
+    let wrongAnswersCount = 0;
+    let currentQuestion = 0;
+
+    function initQuiz() {
+      questions = [...originalQuestions]; 
+      currentQuestion = 0;
+      correctAnswersCount = 0;
+      wrongAnswersCount = 0;
+      updateScore();
+      
+      // Resetare structură HTML (în caz de restart)
+      document.getElementById("quiz-area").innerHTML = `
+        <div class="question-counter" id="question-counter"></div>
+        <div id="question-box" class="question"></div>
+        <div id="feedback"></div>
+        <div class="btn-container">
+          <button id="learn-btn" onclick="showCorrectAnswer()">👀 Vezi Răspunsul</button>
+          <button id="submit-btn" onclick="submitAnswer()">Verifică Răspunsul</button>
+          <button id="next-btn" class="hidden" onclick="nextQuestion()">Următoarea ➡</button>
+        </div>
+      `;
+      
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      window.scrollTo(0, 0);
+
+      const q = questions[currentQuestion];
+      const box = document.getElementById("question-box");
+      const feedback = document.getElementById("feedback");
+      const counter = document.getElementById("question-counter");
+
+      // Reset butoane
+      feedback.innerHTML = "";
+      document.getElementById("next-btn").classList.add("hidden");
+      document.getElementById("submit-btn").classList.remove("hidden");
+      document.getElementById("learn-btn").classList.remove("hidden"); // Ne asigurăm că butonul de învățare apare
+      
+      counter.innerText = `Întrebarea ${currentQuestion + 1} din ${questions.length}`;
+
+      const cleanQuestionText = q.question.replace(/^\d+\.\s*/, '');
+      let html = `<p>${cleanQuestionText}</p>`;
+      
+      q.answers.forEach((answer, i) => {
+        html += `
+          <label>
+            <input type="checkbox" name="answer" value="${i}"> 
+            <span>${answer}</span>
+          </label>`;
+      });
+
+      box.innerHTML = html;
+      updateProgress();
+    }
+
+    // Funcția nouă pentru Modul de Învățare
+    function showCorrectAnswer() {
+      const correct = questions[currentQuestion].correct;
+      const checkboxes = document.querySelectorAll('input[name="answer"]');
+
+      checkboxes.forEach(cb => {
+        const idx = parseInt(cb.value);
+        const label = cb.closest('label');
+
+        if (correct.includes(idx)) {
+          label.classList.add('correct-answer');
+          cb.checked = true; // Bifăm vizual răspunsul corect
+        }
+        cb.disabled = true; // Blocăm interacțiunea
+      });
+
+      // Ascundem butoanele de acțiune și arătăm Next
+      document.getElementById("submit-btn").classList.add("hidden");
+      document.getElementById("learn-btn").classList.add("hidden");
+      document.getElementById("next-btn").classList.remove("hidden");
+
+      // Mesaj informativ
+      document.getElementById("feedback").innerHTML = `<p class="info">👁️ Mod învățare activat. Răspunsul nu a fost punctat.</p>`;
+    }
+
+    function submitAnswer() {
+      const selected = Array.from(document.querySelectorAll('input[name="answer"]:checked'))
+        .map(el => parseInt(el.value))
+        .sort((a, b) => a - b);
+
+      if (selected.length === 0) {
+        alert("Te rog selectează cel puțin un răspuns!");
+        return;
+      }
+
+      const correct = questions[currentQuestion].correct.slice().sort((a, b) => a - b);
+      const feedback = document.getElementById("feedback");
+      const nextBtn = document.getElementById("next-btn");
+      const learnBtn = document.getElementById("learn-btn");
+
+      let isCorrect = arraysEqual(selected, correct);
+
+      if (isCorrect) {
+        correctAnswersCount++;
+        feedback.innerHTML = `<p class="correct">✔️ Corect!</p>`;
+      } else {
+        wrongAnswersCount++;
+        feedback.innerHTML = `<p class="wrong">❌ Greșit.</p>`;
+      }
+      
+      updateScore();
+
+      document.getElementById("submit-btn").classList.add("hidden");
+      learnBtn.classList.add("hidden"); // Ascundem și butonul de învățare după ce ai răspuns
+      nextBtn.classList.remove("hidden");
+
+      const checkboxes = document.querySelectorAll('input[name="answer"]');
+      checkboxes.forEach(cb => {
+        const idx = parseInt(cb.value);
+        const label = cb.closest('label');
+
+        if (correct.includes(idx)) {
+          label.classList.add('correct-answer');
+          if(!cb.checked) cb.checked = true; 
+        }
+
+        if (cb.checked && !correct.includes(idx)) {
+          label.classList.add('wrong-answer');
+        }
+
+        cb.disabled = true;
+      });
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        loadQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+      const percentage = Math.round((correctAnswersCount / questions.length) * 100);
+      let message = "";
+      if (percentage >= 90) message = "Excelent! 🏆";
+      else if (percentage >= 70) message = "Foarte bine! 👏";
+      else if (percentage >= 50) message = "Bun! 👍";
+      else message = "Mai exersează! 📚";
+
+      const quizArea = document.getElementById("quiz-area");
+      quizArea.innerHTML = `
+        <div class="result-box">
+          <h2>Test Terminat!</h2>
+          <p>${message}</p>
+          <div class="result-score">${correctAnswersCount} / ${questions.length}</div>
+          <p>Scor: ${percentage}%</p>
+          <button onclick="initQuiz()" style="margin-top:20px;">🔄 Reîncepe Testul</button>
+        </div>
+      `;
+      document.getElementById("progress").style.width = "100%";
+    }
+
+    function updateProgress() {
+      const progress = document.getElementById("progress");
+      const percent = ((currentQuestion) / questions.length) * 100;
+      progress.style.width = percent + "%";
+    }
+
+    function updateScore() {
+      document.getElementById("correct-count").textContent = correctAnswersCount;
+      document.getElementById("wrong-count").textContent = wrongAnswersCount;
+    }
+
+    function arraysEqual(a, b) {
+      if (a.length !== b.length) return false;
+      for (let i = 0; i < a.length; i++) {
+        if (a[i] !== b[i]) return false;
+      }
+      return true;
+    }
+
+    initQuiz();
+  </script>
+</body>
+</html>
