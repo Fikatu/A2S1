@@ -2,119 +2,222 @@
 <html lang="ro">
 <head>
   <meta charset="UTF-8">
-  <title>Aplicație Grile - Meniu</title>
+  <title>Hub Grile - Ultra Pro</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;800&display=swap" rel="stylesheet">
+  
   <style>
     :root {
-      --primary: #2f80ed;
-      --bg: #f8fafc;
-      --card-bg: #ffffff;
-      --text: #333;
-      --radius: 16px;
+      --bg-dark: #0f172a;
+      --card-dark: #1e293b;
+      --accent: #6366f1;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
     }
 
+    * { box-sizing: border-box; }
+
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: var(--bg);
+      margin: 0;
+      padding: 40px 20px;
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 20px;
-      margin: 0;
-      color: var(--text);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 40%);
     }
 
     h1 {
-      color: var(--primary);
-      margin-bottom: 30px;
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
       text-align: center;
     }
 
-    .menu-grid {
+    p.subtitle {
+      color: var(--text-muted);
+      margin-bottom: 50px;
+      font-size: 1.1rem;
+      text-align: center;
+    }
+
+    .grid-menu {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-      max-width: 800px;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+      max-width: 1000px;
       width: 100%;
     }
 
     .subject-card {
-      background: var(--card-bg);
-      padding: 25px;
-      border-radius: var(--radius);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      background: var(--card-dark);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 24px;
+      padding: 30px;
       text-decoration: none;
-      color: var(--text);
-      transition: transform 0.2s, box-shadow 0.2s;
-      border-left: 6px solid var(--primary);
+      color: var(--text-main);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
       display: flex;
-      align-items: center;
+      flex-direction: column;
       justify-content: space-between;
+      height: 220px;
+      box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
     }
 
     .subject-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+      transform: translateY(-8px);
+      border-color: var(--accent);
+      box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.3);
     }
 
-    .subject-title {
-      font-size: 1.2rem;
-      font-weight: bold;
+    .card-icon {
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      font-size: 2.5rem; /* Pentru emoji-uri */
+    }
+    
+    /* Stil special pentru imaginile de steaguri */
+    .flag-img {
+      width: 48px;
+      height: auto;
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
 
-    .arrow {
+    .card-title {
       font-size: 1.5rem;
-      color: var(--primary);
+      font-weight: 700;
+      margin-bottom: 8px;
     }
 
-    /* Footer */
-    footer {
-      margin-top: 50px;
-      color: #888;
+    .card-desc {
+      color: var(--text-muted);
       font-size: 0.9rem;
+      line-height: 1.4;
     }
+
+    .card-arrow {
+      align-self: flex-end;
+      background: rgba(255,255,255,0.1);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      transition: 0.3s;
+      margin-top: 10px;
+    }
+
+    .subject-card:hover .card-arrow {
+      background: var(--accent);
+      color: white;
+      transform: rotate(-45deg);
+    }
+
+    /* Efect de strălucire la hover */
+    .subject-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 60%);
+      opacity: 0;
+      transition: 0.5s;
+    }
+    .subject-card:hover::before { opacity: 1; }
+
+    footer {
+      margin-top: auto;
+      padding-top: 50px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      opacity: 0.6;
+    }
+
   </style>
 </head>
 <body>
 
-  <h1>🎓 Alege Disciplina</h1>
+  <h1>Platformă Grile</h1>
+  <p class="subtitle">Alege disciplina pentru a începe antrenamentul</p>
 
-  <div class="menu-grid">
+  <div class="grid-menu">
     
-    <a href="da.html" class="subject-card">
-      <span class="subject-title">Drept Administrativ</span>
-      <span class="arrow">➡</span>
-    </a>
-
-    <a href="dreptie.html" class="subject-card">
-      <span class="subject-title">Drept Instituțional European</span>
-      <span class="arrow">➡</span>
-    </a>
-
-    <a href="civil.html" class="subject-card">
-      <span class="subject-title">Drept Civil</span>
-      <span class="arrow">➡</span>
-    </a>
-
-    <a href="finante.html" class="subject-card">
-      <span class="subject-title">Finanțe Publice</span>
-      <span class="arrow">➡</span>
+    <a href="dap.html" class="subject-card">
+      <div>
+        <div class="card-icon">⚖️</div>
+        <div class="card-title">Drept Administrativ</div>
+        <div class="card-desc">Teoria generală, decizii, control administrativ și proceduri.</div>
+      </div>
+      <div class="card-arrow">➜</div>
     </a>
 
     <a href="msp.html" class="subject-card">
-      <span class="subject-title">Managementul Serviciilor Publice</span>
-      <span class="arrow">➡</span>
+      <div>
+        <div class="card-icon">🏙️</div>
+        <div class="card-title">MSP</div>
+        <div class="card-desc">Managementul serviciilor publice, achiziții, organigrame.</div>
+      </div>
+      <div class="card-arrow">➜</div>
     </a>
 
-    <a href="le.html" class="subject-card">
-      <span class="subject-title">Limba Engleză</span>
-      <span class="arrow">➡</span>
+    <a href="civil.html" class="subject-card">
+      <div>
+        <div class="card-icon">📜</div>
+        <div class="card-title">Drept Civil</div>
+        <div class="card-desc">Proprietate, capacitate, moșteniri și contracte civile.</div>
+      </div>
+      <div class="card-arrow">➜</div>
+    </a>
+
+    <a href="finante.html" class="subject-card">
+      <div>
+        <div class="card-icon">💸</div>
+        <div class="card-title">Finanțe Publice</div>
+        <div class="card-desc">Bugetul de stat, taxe, impozite și cheltuieli publice.</div>
+      </div>
+      <div class="card-arrow">➜</div>
+    </a>
+
+    <a href="die.html" class="subject-card">
+      <div>
+        <div class="card-icon">
+          <img src="https://flagcdn.com/w80/eu.png" alt="UE Flag" class="flag-img">
+        </div>
+        <div class="card-title">Drept European</div>
+        <div class="card-desc">Instituțiile UE, tratate, directive și proceduri legislative.</div>
+      </div>
+      <div class="card-arrow">➜</div>
+    </a>
+
+    <a href="engleza.html" class="subject-card">
+      <div>
+        <div class="card-icon">
+          <img src="https://flagcdn.com/w80/gb.png" alt="UK Flag" class="flag-img">
+        </div>
+        <div class="card-title">Limba Engleză</div>
+        <div class="card-desc">Terminologie administrativă, gramatică și vocabular.</div>
+      </div>
+      <div class="card-arrow">➜</div>
     </a>
 
   </div>
 
   <footer>
-    Trailes bahtalo!
+    &copy; Testele domnului Mădălin
   </footer>
 
 </body>

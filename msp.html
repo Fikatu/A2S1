@@ -2,242 +2,371 @@
 <html lang="ro">
 <head>
   <meta charset="UTF-8">
-  <title>Grile MSP - Management Servicii Publice</title>
+  <title>MSP - Ultra Pro</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+  
   <style>
-    /* Stiluri identice cu celelalte pagini */
     :root {
-      --primary: #2f80ed;
-      --primary-dark: #1c60bd;
-      --warning: #f59e0b;
-      --warning-dark: #d97706;
-      --bg: #f8fafc;
-      --text: #333;
-      --card-bg: #ffffff;
-      --border: #e0e0e0;
-      --success: #27ae60;
-      --danger: #c0392b;
-      --radius: 12px;
+      --bg-dark: #0f172a;
+      --card-dark: #1e293b;
+      --accent: #6366f1; /* Indigo */
+      --accent-glow: #818cf8;
+      --correct: #10b981; /* Emerald */
+      --wrong: #ef4444; /* Red */
+      --warning: #f59e0b; /* Amber */
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --radius: 24px;
     }
 
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
     body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 20px;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 20%);
     }
 
-    .container {
-      background: var(--card-bg);
-      border-radius: var(--radius);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      padding: 30px;
-      max-width: 800px;
+    /* --- Top Bar & Progress --- */
+    .top-bar {
       width: 100%;
-      position: relative;
-      margin-top: 20px;
-      margin-bottom: 40px;
-    }
-
-    .header-stats {
+      max-width: 700px;
+      padding: 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
-      font-size: 0.95rem;
-      color: #555;
-      background: #f1f5f9;
-      padding: 10px 15px;
-      border-radius: 8px;
+      z-index: 10;
     }
 
-    .score-badge { font-weight: bold; }
-    
-    .question-counter {
-      font-size: 0.9rem;
-      color: #888;
-      margin-bottom: 10px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .question p {
-      font-size: 1.25rem;
-      line-height: 1.5;
-      color: var(--text);
-      font-weight: 600;
-      margin-bottom: 25px;
-    }
-
-    label {
-      display: flex;
-      align-items: flex-start;
-      padding: 14px 16px;
-      background: #fff;
-      border: 2px solid #f1f5f9;
-      border-radius: var(--radius);
-      margin-bottom: 12px;
+    .back-btn {
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: var(--text-main);
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      font-size: 1.2rem;
       cursor: pointer;
-      transition: all 0.2s ease;
+      display: grid;
+      place-items: center;
+      transition: 0.2s;
+      text-decoration: none;
+    }
+    .back-btn:hover { background: rgba(255,255,255,0.2); }
+
+    .streak-container {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warning);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    /* --- Main Card --- */
+    .quiz-container {
+      width: 100%;
+      max-width: 650px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 10px 20px 40px;
       position: relative;
     }
 
-    label:hover {
-      background: #f8fafc;
-      border-color: #dbeafe;
+    /* Timer Line */
+    .timer-wrapper {
+      width: 100%;
+      height: 6px;
+      background: #334155;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+    .timer-bar {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-glow));
+      border-radius: 10px;
+      transform-origin: left;
+      transition: transform 1s linear; /* Va fi animat din JS */
     }
 
-    input[type="checkbox"] {
-      margin-right: 15px;
-      margin-top: 4px;
-      transform: scale(1.3);
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-
-    /* Butoane */
-    .btn-container {
-      display: flex;
-      gap: 10px;
-      margin-top: 30px;
-      flex-wrap: wrap;
-    }
-
-    button {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 14px 20px;
-      font-size: 16px;
-      font-weight: 600;
+    .question-card {
+      background: var(--card-dark);
       border-radius: var(--radius);
+      padding: 30px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255,255,255,0.05);
+      animation: fadeInScale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      margin-bottom: 20px;
+    }
+
+    .q-number {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .q-text {
+      font-size: 1.3rem;
+      line-height: 1.5;
+      font-weight: 600;
+      margin: 0 0 10px 0;
+    }
+
+    /* --- Answers --- */
+    .answers-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .answer-option {
+      position: relative;
+      background: rgba(255,255,255,0.03);
+      border: 2px solid rgba(255,255,255,0.08);
+      padding: 18px 20px;
+      border-radius: 16px;
       cursor: pointer;
-      flex: 1;
-      min-width: 150px;
-      transition: background 0.2s ease, transform 0.1s ease;
+      transition: all 0.2s;
+      display: flex;
+      align-items: flex-start;
+      gap: 15px;
+      font-size: 1rem;
     }
 
-    button:hover { background: var(--primary-dark); }
-    button:active { transform: scale(0.98); }
+    .answer-option:hover {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(255,255,255,0.2);
+      transform: translateX(5px);
+    }
 
-    button#learn-btn {
-      background: var(--warning);
+    /* Custom Checkbox */
+    .custom-check {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--text-muted);
+      border-radius: 8px;
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+      transition: 0.2s;
+      margin-top: 2px;
+    }
+    .custom-check::after {
+      content: '✔';
+      font-size: 14px;
       color: #fff;
-    }
-    button#learn-btn:hover {
-      background: var(--warning-dark);
-    }
-
-    /* FEEDBACK VIZUAL */
-    .correct { color: var(--success); font-weight: bold; margin-top: 15px;}
-    .wrong { color: var(--danger); font-weight: bold; margin-top: 15px;}
-    .info { color: var(--warning-dark); font-weight: bold; margin-top: 15px;}
-
-    label.correct-answer {
-      background-color: #d1fae5;
-      border-color: #27ae60;
-      color: #064e3b;
-      border-left: 6px solid #27ae60;
+      transform: scale(0);
+      transition: 0.2s;
     }
 
-    label.wrong-answer {
-      background-color: #f06262;
-      border-color: #ef4444;
-      border-left: 6px solid #ef4444;
+    /* Hide default checkbox */
+    input[type="checkbox"] { display: none; }
+    
+    /* Checked State (User Selection) */
+    input:checked + .custom-check {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    input:checked + .custom-check::after {
+      transform: scale(1);
+    }
+    input:checked ~ .ans-text {
+      color: #fff;
+      font-weight: 500;
+    }
+    .answer-option.selected {
+      background: rgba(99, 102, 241, 0.15);
+      border-color: var(--accent);
+    }
+
+    /* --- Correct / Wrong States --- */
+    .answer-option.correct {
+      background: rgba(16, 185, 129, 0.15) !important;
+      border-color: var(--correct) !important;
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+    }
+    .answer-option.correct .custom-check {
+      background: var(--correct) !important;
+      border-color: var(--correct) !important;
+    }
+
+    .answer-option.wrong {
+      background: rgba(239, 68, 68, 0.15) !important;
+      border-color: var(--wrong) !important;
       animation: shake 0.4s ease;
     }
+    .answer-option.wrong .custom-check {
+      background: var(--wrong) !important;
+      border-color: var(--wrong) !important;
+    }
+    .answer-option.wrong .custom-check::after {
+      content: '✖';
+    }
 
+    /* --- Buttons --- */
+    .controls {
+      display: flex;
+      gap: 15px;
+      margin-top: auto;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 18px;
+      border-radius: 16px;
+      border: none;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+    }
+    .btn:active { transform: translateY(4px); box-shadow: none; }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 4px 0 #4338ca;
+    }
+    .btn-primary:hover { background: #4f46e5; }
+
+    .btn-secondary {
+      background: transparent;
+      border: 2px solid var(--text-muted);
+      color: var(--text-muted);
+      box-shadow: none;
+    }
+    .btn-secondary:hover {
+      border-color: var(--text-main);
+      color: var(--text-main);
+    }
+
+    .btn-learn {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--warning);
+      border: 1px solid var(--warning);
+      box-shadow: none;
+    }
+
+    /* --- Results Screen --- */
+    .result-view {
+      text-align: center;
+      padding: 40px 20px;
+      animation: slideUp 0.5s ease;
+    }
+    .score-circle {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      border: 8px solid var(--card-dark);
+      background: conic-gradient(var(--accent) 0%, var(--card-dark) 0%);
+      margin: 0 auto 30px;
+      display: grid;
+      place-items: center;
+      font-size: 3.5rem;
+      font-weight: 800;
+      position: relative;
+      box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+    }
+    .score-circle::before {
+      content: '';
+      position: absolute;
+      inset: 10px;
+      background: var(--bg-dark);
+      border-radius: 50%;
+      z-index: -1;
+    }
+
+    /* --- Utilities --- */
     .hidden { display: none !important; }
-
-    .progress-container {
-      width: 100%;
-      max-width: 800px;
-      background: #e2e8f0;
-      height: 8px;
-      border-radius: 100px;
-      overflow: hidden;
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 100;
-    }
-
-    .progress-fill {
-      height: 100%;
-      width: 0%;
-      background: var(--primary);
-      transition: width 0.3s ease;
-    }
-
-    .result-box { text-align: center; padding: 20px; }
-    .result-score { font-size: 3rem; font-weight: bold; color: var(--primary); margin: 20px 0; }
     
-    .back-link {
-        text-decoration: none; 
-        color: #666; 
-        font-weight: bold; 
-        margin-bottom: 20px; 
-        display: inline-block;
-        padding: 5px 10px;
-        background: #eee;
-        border-radius: 8px;
+    @keyframes fadeInScale {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
     }
-    .back-link:hover { background: #ddd; color: #333; }
-
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      75% { transform: translateX(5px); }
+      25% { transform: translateX(-8px); }
+      75% { transform: translateX(8px); }
     }
 
-    @media (max-width: 600px) {
-      .container { padding: 20px; margin-top: 10px; border-radius: 0; box-shadow: none; }
-      .header-stats { flex-direction: column; gap: 5px; text-align: center;}
-      .question p { font-size: 1.1rem; }
-      button { font-size: 15px; padding: 12px; }
+    /* Confetti (CSS Only) */
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background-color: #f00;
+      animation: fall linear forwards;
+      z-index: 100;
+    }
+    @keyframes fall {
+      to { transform: translateY(100vh) rotate(720deg); }
     }
   </style>
 </head>
 <body>
 
-  <div class="progress-container">
-    <div class="progress-fill" id="progress"></div>
+  <div class="top-bar">
+    <a href="index.html" class="back-btn">✕</a>
+    <div class="streak-container">
+      <span id="streak-icon">🔥</span>
+      <span id="streak-count">0</span>
+    </div>
   </div>
 
-  <div class="container">
-    <a href="index.html" class="back-link">⬅ Înapoi la Meniu</a>
-
-    <div class="header-stats">
-       <span>✅ Corecte: <span id="correct-count" class="score-badge" style="color:var(--success)">0</span></span>
-       <span>❌ Greșite: <span id="wrong-count" class="score-badge" style="color:var(--danger)">0</span></span>
+  <div class="quiz-container" id="quiz-container">
+    
+    <div class="timer-wrapper">
+      <div class="timer-bar" id="timer-bar"></div>
     </div>
 
-    <div id="quiz-area">
-      <div class="question-counter" id="question-counter"></div>
-      <div id="question-box" class="question"></div>
+    <div class="question-card" id="question-card">
+      <div class="q-number" id="q-number">Întrebarea 1</div>
+      <p class="q-text" id="q-text">Se încarcă...</p>
       
-      <div id="feedback"></div>
-
-      <div class="btn-container">
-        <button id="learn-btn" onclick="showCorrectAnswer()">👀 Vezi Răspunsul</button>
-        <button id="submit-btn" onclick="submitAnswer()">Verifică Răspunsul</button>
-        <button id="next-btn" class="hidden" onclick="nextQuestion()">Următoarea ➡</button>
-      </div>
+      <div class="answers-list" id="answers-list">
+        </div>
     </div>
+
+    <div class="controls">
+      <button class="btn btn-learn" id="learn-btn" onclick="triggerLearnMode()">👀 Învață</button>
+      <button class="btn btn-primary" id="action-btn" onclick="handleAction()">Verifică</button>
+    </div>
+
   </div>
 
   <script>
-    /* ÎNTREBĂRI MSP - Extrase din PDF */
-    const originalQuestions = [
+    /* DATELE TALE MSP */
+    const questions = [
       {
         question: "1. Biroul de Achizitii publice din cadrul Universitatii Tehnice este:",
         answers: [
@@ -246,7 +375,7 @@
           "c) un spatiu ce poate avea cel mult 20 de posturi de munca ocupate;",
           "d) un element component al structurii organizatorice."
         ],
-        correct: [3] // d (cel mai general corect), posibil și b
+        correct: [3] 
       },
       {
         question: "2. Utilizarea mijloacelor electronice in procesul de comunicare determina o serie de dezavantaje:",
@@ -256,7 +385,7 @@
           "c) se pot scurge informatii confidentiale;",
           "d) au un cost foarte mare fata de alte canale de comunicare."
         ],
-        correct: [1, 2] // b, c
+        correct: [1, 2]
       },
       {
         question: "3. In anumite situatii, institutiile stabilesc unul sau mai multi purtatori de cuvant pentru relatiile cu presa, datorita:",
@@ -266,7 +395,7 @@
           "c) absenta unuia dintre ei din tara;",
           "d) lipsei de timp a liderului unei institutii"
         ],
-        correct: [3] // d
+        correct: [3]
       },
       {
         question: "4. Metodele utilizate in adoptarea deciziilor pot fi:",
@@ -276,7 +405,7 @@
           "c) de optimizare;",
           "d) comparative."
         ],
-        correct: [2] // c (metode de optimizare a deciziilor)
+        correct: [2]
       },
       {
         question: "5. Decidentul unei institutii publice este reprezentat de:",
@@ -286,7 +415,7 @@
           "c) un executant care hotaraste modul de actiune a activitatilor zilnice;",
           "d) un organism managerial care, conform responsabilitatilor circumscrise ia decizia in situatia respectiva."
         ],
-        correct: [0, 3] // a, d
+        correct: [0, 3]
       },
       {
         question: "6. Care dintre urmatoarele caracteristici apartin modelului de comunicare Shannon-Weaver:",
@@ -296,7 +425,7 @@
           "c) comunicarea presupune capacitatea de a anticipa reactiile celorlalti;",
           "d) receptorul percepe mesajul exact in forma si cu continutul dorit de emitator"
         ],
-        correct: [3] // d (idealul modelului tehnic)
+        correct: [3]
       },
       {
         question: "7. Prin imaginea organizationala se distinge un concept complex constituit din urmatoarele elemente:",
@@ -306,7 +435,7 @@
           "c) succesele si stabilitatea organizatiei din punct de vedere financiar;",
           "d) calitatea ofertei sale si reputatia organizatiei."
         ],
-        correct: [0, 1, 2, 3] // Toate contribuie la imagine
+        correct: [0, 1, 2, 3]
       },
       {
         question: "8. Managerul public trebuie sa stabileasca in continutul unei decizii:",
@@ -316,7 +445,7 @@
           "c) obiectivul urmarit;",
           "d) locul si responsabilul aplicarii acesteia."
         ],
-        correct: [0, 2, 3] // a, c, d
+        correct: [0, 2, 3]
       },
       {
         question: "9. Orice situatie decizionala presupune in mod obligatoriu:",
@@ -326,7 +455,7 @@
           "c) cunoasterea calitatilor personale ale decidentilor;",
           "d) unul sau mai multe obiective de atins."
         ],
-        correct: [0, 3] // a, d
+        correct: [0, 3]
       },
       {
         question: "10. La Institutia Prefectului din Bacau, managementul comunicarii se bazeaza pe planificarea relatiilor publice pe o serie de etape:",
@@ -336,7 +465,7 @@
           "c) formularea strategiilor;",
           "d) identificarea problemei."
         ],
-        correct: [0] // a (cuprinde tot procesul)
+        correct: [0]
       },
       {
         question: "11. Care dintre enunturile de mai jos reprezinta caracteristici importante ale deciziei manageriale:",
@@ -346,7 +475,7 @@
           "c) evenimentele analizate logic se bazeaza pe experienta si intuitie;",
           "d) alegerea unei solutii trebuie sa fie rezultatul unui act spontan."
         ],
-        correct: [0, 1] // a, b
+        correct: [0, 1]
       },
       {
         question: "12. In organizatiile publice, avantajele utilizarii 'postei' ca un canal de comunicare sunt:",
@@ -356,27 +485,27 @@
           "c) mesajele sunt consecvente catre toti primitorii;",
           "d) mesajele au un volum excesiv."
         ],
-        correct: [0, 2] // a, c
+        correct: [0, 2]
       },
       {
         question: "13. Structura organizationala a unei organizatii publice cuprinde urmatoarele componente:",
         answers: [
           "a) planurile decizionale;",
           "b) compartimente cu rol de exprimare a diviziunii muncii in cadrul administratiei locale;",
-          "c) autoritatea si responsabilitatea angajatilor;", // a fost separat eronat în PDF, l-am unit
+          "c) autoritatea si responsabilitatea angajatilor;", 
           "d) relatiile ce se stabilesc intre compartimente."
         ],
-        correct: [1, 2, 3] // b, c, d (posturi, compartimente, relații)
+        correct: [1, 2, 3]
       },
       {
         question: "14. In realizarea planului de relatii publice se pot incadra urmatoarele tipuri de activitati:",
         answers: [
           "a) lobby-ul;",
           "b) organizarea de evenimente publice;",
-          "c) discursuri periodice in piete publice;", // unit cu varianta de sus
+          "c) discursuri periodice in piete publice;", 
           "d) publicitatea."
         ],
-        correct: [0, 1, 3] // a, b, d
+        correct: [0, 1, 3]
       },
       {
         question: "15. Cele mai importante criterii de clasificare ale deciziilor utilizate in management sunt:",
@@ -386,7 +515,7 @@
           "c) dupa sfera de competenta a managerului implicat in procesul de conducere;",
           "d) dupa sfera de incompetenta a sefului direct."
         ],
-        correct: [0, 1, 2] // a, b, c
+        correct: [0, 1, 2]
       },
       {
         question: "16. Care dintre urmatoarele definitii privind comunicarea sunt corecte:",
@@ -395,7 +524,7 @@
           "b) comunicarea verticala descendenta apare intre persoane care ocupa pozitii situate la acelasi nivel ierarhic in sistemul de management;",
           "c) comunicarea verticala descendenta cuprinde fluxuri de informatii (mesaje) generate de managerii de la nivelurile cele mai de jos ale institutiei si adresate celor de la nivelurile superioare."
         ],
-        correct: [0] // a
+        correct: [0]
       },
       {
         question: "17. Orice decizie luata la un moment dat in organizatia publica presupune existenta unui mecanism din care fac parte mai multe sisteme:",
@@ -405,7 +534,7 @@
           "c) de previziune;",
           "d) de masurare a performantelor."
         ],
-        correct: [0, 1, 2, 3] // Toate sunt necesare
+        correct: [0, 1, 2, 3]
       },
       {
         question: "18. Construirea alternativelor de decizie este o etapa in care:",
@@ -415,7 +544,7 @@
           "c) sunt stabilite, studiate si previzionate consecintele mai multor variante;",
           "d) se pregateste momentul deciziei."
         ],
-        correct: [1, 2] // b, c
+        correct: [1, 2]
       },
       {
         question: "19. Mediul ambiant decizional consta in:",
@@ -425,7 +554,7 @@
           "c) suma de influente directe si indirecte semnificative legate de continutul si rezultatele deciziei manageriale;",
           "d) integrarea schimbarilor din mediul de actiune al managerilor in activitatile lor personale."
         ],
-        correct: [1, 2] // b, c
+        correct: [1, 2]
       },
       {
         question: "20. Caracterizati 'comunicarea in fata unui auditoriu' selectind dintre urmatoarele aspecte enumerate in continuare:",
@@ -435,7 +564,7 @@
           "c) permite identificarea problemelor care determina disfunctionalitatile din organizatie;",
           "d) are ca scop formarea unei imagini proprii, a grupului sau a organizatiei."
         ],
-        correct: [1, 3] // b, d
+        correct: [1, 3]
       },
       {
         question: "21. Structura oricarei unitati a administratiei publice este reprezentata grafic prin organigrame simbolizate astfel:",
@@ -445,7 +574,7 @@
           "c) linii - care evidentiaza relatiile dintre compartimente;",
           "d) casute dreptunghiulare - posturi de conducere si compartimentele functionale de pe diferite niveluri ierarhice."
         ],
-        correct: [0, 2, 3] // a, c, d
+        correct: [0, 2, 3]
       },
       {
         question: "22. In orice proces decizional trebuie sa fie respectate cerintele enumerate mai jos:",
@@ -455,7 +584,7 @@
           "c) deciziile si dispozitiile ce decurg din activitatea managerilor sunt transmise executantilor fara a avea interpretari diferite;",
           "d) deciziile trebuie sa fie fundamentate stiintific ori de cate ori este posibil si recomandabil."
         ],
-        correct: [0, 2, 3] // a, c, d
+        correct: [0, 2, 3]
       },
       {
         question: "23. Intr-o configuratie structurala, 'functiile' pot fi:",
@@ -465,7 +594,7 @@
           "c) totalitatea posturilor care prezinta aceleasi caracteristici principale;",
           "d) totalitatea posturilor care prezinta caracteristici principale absolut complementare."
         ],
-        correct: [0, 2] // a, c
+        correct: [0, 2]
       },
       {
         question: "24. Comunicarea orizontala apare in cadrul unei organizatii publice:",
@@ -475,7 +604,7 @@
           "c) intre persoane care ocupa pozitii situate la niveluri ierarhice diferite in sistemul de management;",
           "d) intre persoane intre care exista relatii organizatorice de cooperare."
         ],
-        correct: [0, 1, 3] // a, b, d
+        correct: [0, 1, 3]
       },
       {
         question: "25. Unele institutii publice utilizeaza 'adresarea orala' care poate avea ca forme specifice importante:",
@@ -485,7 +614,7 @@
           "c) raportul de situatie;",
           "d) briefingul."
         ],
-        correct: [3] // d
+        correct: [3]
       },
       {
         question: "26. Criteriile ce trebuie avute in vedere in procesul alegerii ca decizie optima, a uneia dintre variantele prezentate decidentilor sunt:",
@@ -495,7 +624,7 @@
           "c) rolul comunitatii in urmarirea efectelor asteptate;",
           "d) importanta deosebita a factorului uman."
         ],
-        correct: [0, 1, 3] // a, b, d (eficienta, eficacitate)
+        correct: [0, 1, 3]
       },
       {
         question: "27. Cele mai importante caracterstici ale relatiilor publice sunt:",
@@ -505,7 +634,7 @@
           "c) performanta;",
           "d) deliberarea."
         ],
-        correct: [0, 2, 3] // a, c, d
+        correct: [0, 2, 3]
       },
       {
         question: "28. In categoria situatiilor de criza in care sunt obligate sa se implice organizatiile publice se pot incadra:",
@@ -515,7 +644,7 @@
           "c) prezentarea noului Prefect numit de primul-ministru la Vaslui;",
           "d) catastrofele naturale (cutremure, inudatii)."
         ],
-        correct: [0, 1, 3] // a, b, d
+        correct: [0, 1, 3]
       },
       {
         question: "29. Fiecare angajat al unei institutii publice trebuie sa participe la stagii de insusire a unor tehnici de comunicare eficienta in situatii de criza, la nivelul:",
@@ -525,7 +654,7 @@
           "c) interpresonal;",
           "d) autoprezentarii."
         ],
-        correct: [2, 3] // c, d (la nivel individual)
+        correct: [2, 3]
       },
       {
         question: "30. Prin controlul gradului de indeplinire a unei decizii in cadrul Primariei Iasi se urmareste:",
@@ -535,7 +664,7 @@
           "c) formularea unor dispozitii, ordine, insstructiuni;",
           "d) determinarea cauzelor care au generat eventuale abateri de la program si de la rezultate asteptate."
         ],
-        correct: [3] // d (definiția controlului)
+        correct: [3]
       },
       {
         question: "31. Printre elementele componente ale imaginii organizationale sunt identificate:",
@@ -545,7 +674,7 @@
           "c) consultanta;",
           "d) identitatea."
         ],
-        correct: [3] // d (identitatea este nucleul imaginii)
+        correct: [3]
       },
       {
         question: "32. Care dintre enunturile de mai jos constituie caracteristicile importante in adoptarea deciziei manageriale:",
@@ -555,7 +684,7 @@
           "c) decizia trebuie sa fie rezultatul unui proces decizional rational;",
           "d) continutul deciziei cuprinde una, doua sau mai multe variante de actiune."
         ],
-        correct: [0, 1, 2, 3] // Toate
+        correct: [0, 1, 2, 3]
       },
       {
         question: "33. Relatiile (legaturile) structurale se stabilesc penrtu o organizatie publica:",
@@ -565,7 +694,7 @@
           "c) ca urmare a necesitatii comunicarii intre compartimente;",
           "d) intre compartimente sau salariatii din organizatii publice diferite ale comunitatii."
         ],
-        correct: [0, 2] // a, c
+        correct: [0, 2]
       },
       {
         question: "34. Structura organizatorica a unei institutii publice locale reprezinta:",
@@ -575,7 +704,7 @@
           "c) nivelul rezultatelor programate de sefii institutiei publice pentru un an;",
           "d) numarul de activitati planificate anual de catre conducere."
         ],
-        correct: [1] // b
+        correct: [1]
       },
       {
         question: "35. Activitatea de lobby in cazul unei organizatii publice:",
@@ -585,143 +714,149 @@
           "c) se realizeaza prin mijloacele specifice relatiilor publice;",
           "d) se desfasoara pentru luarea in discutie a unor probleme de interes public."
         ],
-        correct: [0, 2, 3] // a, c, d
+        correct: [0, 2, 3]
       }
     ];
 
-    let questions = []; 
-    let correctAnswersCount = 0;
-    let wrongAnswersCount = 0;
-    let currentQuestion = 0;
+    let currentQ = 0;
+    let correctCount = 0;
+    let streak = 0;
+    let isAnswered = false;
 
+    // Elemente DOM
+    const qText = document.getElementById("q-text");
+    const qNum = document.getElementById("q-number");
+    const answersList = document.getElementById("answers-list");
+    const actionBtn = document.getElementById("action-btn");
+    const learnBtn = document.getElementById("learn-btn");
+    const streakEl = document.getElementById("streak-count");
+    const timerBar = document.getElementById("timer-bar");
+
+    // Init
     function initQuiz() {
-      questions = [...originalQuestions]; 
-      
-      currentQuestion = 0;
-      correctAnswersCount = 0;
-      wrongAnswersCount = 0;
-      updateScore();
-      
-      document.getElementById("quiz-area").innerHTML = `
-        <div class="question-counter" id="question-counter"></div>
-        <div id="question-box" class="question"></div>
-        <div id="feedback"></div>
-        <div class="btn-container">
-          <button id="learn-btn" onclick="showCorrectAnswer()">👀 Vezi Răspunsul</button>
-          <button id="submit-btn" onclick="submitAnswer()">Verifică Răspunsul</button>
-          <button id="next-btn" class="hidden" onclick="nextQuestion()">Următoarea ➡</button>
-        </div>
-      `;
-      
+      currentQ = 0;
+      correctCount = 0;
+      streak = 0;
+      updateStreakUI();
       loadQuestion();
     }
 
     function loadQuestion() {
-      window.scrollTo(0, 0);
-
-      const q = questions[currentQuestion];
-      const box = document.getElementById("question-box");
-      const feedback = document.getElementById("feedback");
-      const counter = document.getElementById("question-counter");
-
-      feedback.innerHTML = "";
-      document.getElementById("next-btn").classList.add("hidden");
-      document.getElementById("submit-btn").classList.remove("hidden");
-      document.getElementById("learn-btn").classList.remove("hidden");
+      isAnswered = false;
+      actionBtn.innerText = "VERIFICĂ";
+      actionBtn.onclick = handleAction;
+      actionBtn.style.display = "block";
+      learnBtn.style.display = "block";
       
-      counter.innerText = `Întrebarea ${currentQuestion + 1} din ${questions.length}`;
+      // Update Timer Animation (reset)
+      timerBar.style.transition = "none";
+      timerBar.style.transform = "scaleX(1)";
+      setTimeout(() => {
+        timerBar.style.transition = "transform 60s linear";
+        timerBar.style.transform = "scaleX(0)";
+      }, 100);
 
-      // Eliminare numerotare hardcodata din text (ex "1.Intrebare" -> "Intrebare")
-      const cleanQuestionText = q.question.replace(/^\d+\.\s*/, '');
-      let html = `<p>${cleanQuestionText}</p>`;
+      const q = questions[currentQ];
+      qNum.innerText = `Întrebarea ${currentQ + 1} / ${questions.length}`;
+      qText.innerText = q.question.replace(/^\d+\.\s*/, '');
       
-      q.answers.forEach((answer, i) => {
-        html += `
-          <label>
-            <input type="checkbox" name="answer" value="${i}"> 
-            <span>${answer}</span>
-          </label>`;
+      answersList.innerHTML = "";
+      
+      q.answers.forEach((ans, i) => {
+        const div = document.createElement("label");
+        div.className = "answer-option";
+        div.innerHTML = `
+          <input type="checkbox" name="ans" value="${i}">
+          <div class="custom-check"></div>
+          <span class="ans-text">${ans}</span>
+        `;
+        // Toggle selection visual
+        div.querySelector("input").addEventListener("change", function() {
+          if(this.checked) div.classList.add("selected");
+          else div.classList.remove("selected");
+        });
+        answersList.appendChild(div);
       });
-
-      box.innerHTML = html;
-      updateProgress();
     }
 
-    function showCorrectAnswer() {
-      const correct = questions[currentQuestion].correct;
-      const checkboxes = document.querySelectorAll('input[name="answer"]');
-
-      checkboxes.forEach(cb => {
-        const idx = parseInt(cb.value);
-        const label = cb.closest('label');
-
-        if (correct.includes(idx)) {
-          label.classList.add('correct-answer');
-          cb.checked = true; 
-        }
-        cb.disabled = true; 
-      });
-
-      document.getElementById("submit-btn").classList.add("hidden");
-      document.getElementById("learn-btn").classList.add("hidden");
-      document.getElementById("next-btn").classList.remove("hidden");
-      document.getElementById("feedback").innerHTML = `<p class="info">👁️ Mod învățare activat. Răspunsul nu a fost punctat.</p>`;
-    }
-
-    function submitAnswer() {
-      const selected = Array.from(document.querySelectorAll('input[name="answer"]:checked'))
-        .map(el => parseInt(el.value))
-        .sort((a, b) => a - b);
-
-      if (selected.length === 0) {
-        alert("Te rog selectează cel puțin un răspuns!");
-        return;
+    function handleAction() {
+      if (!isAnswered) {
+        checkAnswer();
+      } else {
+        nextQuestion();
       }
+    }
 
-      const correct = questions[currentQuestion].correct.slice().sort((a, b) => a - b);
-      const feedback = document.getElementById("feedback");
-      const nextBtn = document.getElementById("next-btn");
-      const learnBtn = document.getElementById("learn-btn");
+    function checkAnswer() {
+      const checked = Array.from(document.querySelectorAll('input[name="ans"]:checked'));
+      if (checked.length === 0) return; // Nu face nimic daca nu e selectat
 
-      let isCorrect = arraysEqual(selected, correct);
+      isAnswered = true;
+      const userIdx = checked.map(c => parseInt(c.value)).sort();
+      const correctIdx = questions[currentQ].correct.slice().sort();
+
+      const isCorrect = JSON.stringify(userIdx) === JSON.stringify(correctIdx);
+
+      // Disable inputs
+      document.querySelectorAll("input").forEach(i => i.disabled = true);
+      document.querySelectorAll(".answer-option").forEach(opt => opt.style.pointerEvents = "none");
+
+      // Show Results
+      const options = document.querySelectorAll(".answer-option");
+      options.forEach((opt, i) => {
+        const input = opt.querySelector("input");
+        
+        if (correctIdx.includes(i)) {
+          opt.classList.add("correct");
+        }
+        if (input.checked && !correctIdx.includes(i)) {
+          opt.classList.add("wrong");
+        }
+      });
 
       if (isCorrect) {
-        correctAnswersCount++;
-        feedback.innerHTML = `<p class="correct">✔️ Corect!</p>`;
+        correctCount++;
+        streak++;
+        actionBtn.innerText = "CORECT! CONTINUĂ";
+        actionBtn.style.background = "var(--correct)";
       } else {
-        wrongAnswersCount++;
-        feedback.innerHTML = `<p class="wrong">❌ Greșit.</p>`;
+        streak = 0;
+        actionBtn.innerText = "GREȘIT... CONTINUĂ";
+        actionBtn.style.background = "var(--wrong)";
       }
+
+      updateStreakUI();
+      actionBtn.onclick = nextQuestion;
+      learnBtn.style.display = "none";
+    }
+
+    function triggerLearnMode() {
+      isAnswered = true;
+      const correctIdx = questions[currentQ].correct;
       
-      updateScore();
-
-      document.getElementById("submit-btn").classList.add("hidden");
-      learnBtn.classList.add("hidden");
-      nextBtn.classList.remove("hidden");
-
-      const checkboxes = document.querySelectorAll('input[name="answer"]');
-      checkboxes.forEach(cb => {
-        const idx = parseInt(cb.value);
-        const label = cb.closest('label');
-
-        // VERDE PENTRU CORECT
-        if (correct.includes(idx)) {
-          label.classList.add('correct-answer');
-          if(!cb.checked) cb.checked = true; 
+      document.querySelectorAll(".answer-option").forEach((opt, i) => {
+        if (correctIdx.includes(i)) {
+          opt.classList.add("correct");
         }
-
-        // ROȘU PENTRU GREȘEALĂ
-        if (cb.checked && !correct.includes(idx)) {
-          label.classList.add('wrong-answer');
-        }
-
-        cb.disabled = true;
+        opt.style.pointerEvents = "none";
+        opt.querySelector("input").disabled = true;
       });
+
+      streak = 0; // Penalizare streak pt learn mode
+      updateStreakUI();
+      
+      actionBtn.innerText = "URMĂTOAREA";
+      actionBtn.style.background = "var(--accent)";
+      actionBtn.onclick = nextQuestion;
+      learnBtn.style.display = "none";
     }
 
     function nextQuestion() {
-      currentQuestion++;
-      if (currentQuestion < questions.length) {
+      currentQ++;
+      // Reset Button Style
+      actionBtn.style.background = "var(--accent)";
+      
+      if (currentQ < questions.length) {
         loadQuestion();
       } else {
         showResults();
@@ -729,46 +864,53 @@
     }
 
     function showResults() {
-      const percentage = Math.round((correctAnswersCount / questions.length) * 100);
-      let message = "";
-      if (percentage >= 90) message = "Excelent! 🏆";
-      else if (percentage >= 70) message = "Foarte bine! 👏";
-      else if (percentage >= 50) message = "Bun! 👍";
-      else message = "Mai exersează! 📚";
+      const percent = Math.round((correctCount / questions.length) * 100);
+      const container = document.getElementById("quiz-container");
+      
+      // Trigger Confetti if good score
+      if(percent >= 50) fireConfetti();
 
-      const quizArea = document.getElementById("quiz-area");
-      quizArea.innerHTML = `
-        <div class="result-box">
-          <h2>Test Terminat!</h2>
-          <p>${message}</p>
-          <div class="result-score">${correctAnswersCount} / ${questions.length}</div>
-          <p>Scor: ${percentage}%</p>
-          <button onclick="initQuiz()" style="margin-top:20px;">🔄 Reîncepe Testul</button>
+      let msg = percent > 80 ? "Ești genial! 🚀" : "Bun, dar mai poți! 💪";
+
+      container.innerHTML = `
+        <div class="result-view">
+          <div class="score-circle">
+            <span style="z-index:2; color:white;">${percent}%</span>
+          </div>
+          <h1 style="margin:0;">${msg}</h1>
+          <p style="color:var(--text-muted); font-size:1.2rem; margin-top:10px;">
+            Ai răspuns corect la ${correctCount} din ${questions.length} întrebări.
+          </p>
+          <div class="controls" style="margin-top:40px;">
+             <button class="btn btn-secondary" onclick="location.href='index.html'">Meniu</button>
+             <button class="btn btn-primary" onclick="location.reload()">Din Nou</button>
+          </div>
         </div>
       `;
-      document.getElementById("progress").style.width = "100%";
     }
 
-    function updateProgress() {
-      const progress = document.getElementById("progress");
-      const percent = ((currentQuestion) / questions.length) * 100;
-      progress.style.width = percent + "%";
+    function updateStreakUI() {
+      streakEl.innerText = streak;
+      if(streak > 2) streakEl.parentElement.style.background = "rgba(245, 158, 11, 0.4)";
+      else streakEl.parentElement.style.background = "rgba(245, 158, 11, 0.15)";
     }
 
-    function updateScore() {
-      document.getElementById("correct-count").textContent = correctAnswersCount;
-      document.getElementById("wrong-count").textContent = wrongAnswersCount;
-    }
-
-    function arraysEqual(a, b) {
-      if (a.length !== b.length) return false;
-      for (let i = 0; i < a.length; i++) {
-        if (a[i] !== b[i]) return false;
+    function fireConfetti() {
+      const colors = ['#6366f1', '#10b981', '#f59e0b', '#ec4899'];
+      for (let i = 0; i < 50; i++) {
+        const conf = document.createElement('div');
+        conf.className = 'confetti';
+        conf.style.left = Math.random() * 100 + 'vw';
+        conf.style.top = -10 + 'px';
+        conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        conf.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        document.body.appendChild(conf);
       }
-      return true;
     }
 
+    // Start
     initQuiz();
+
   </script>
 </body>
 </html>
