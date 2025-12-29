@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <title>Grile MSP - Management Servicii Publice</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <style>
+    /* Stiluri identice cu celelalte pagini */
+    :root {
+      --primary: #2f80ed;
+      --primary-dark: #1c60bd;
+      --warning: #f59e0b;
+      --warning-dark: #d97706;
+      --bg: #f8fafc;
+      --text: #333;
+      --card-bg: #ffffff;
+      --border: #e0e0e0;
+      --success: #27ae60;
+      --danger: #c0392b;
+      --radius: 12px;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      padding: 30px;
+      max-width: 800px;
+      width: 100%;
+      position: relative;
+      margin-top: 20px;
+      margin-bottom: 40px;
+    }
+
+    .header-stats {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      font-size: 0.95rem;
+      color: #555;
+      background: #f1f5f9;
+      padding: 10px 15px;
+      border-radius: 8px;
+    }
+
+    .score-badge { font-weight: bold; }
+    
+    .question-counter {
+      font-size: 0.9rem;
+      color: #888;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .question p {
+      font-size: 1.25rem;
+      line-height: 1.5;
+      color: var(--text);
+      font-weight: 600;
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: flex;
+      align-items: flex-start;
+      padding: 14px 16px;
+      background: #fff;
+      border: 2px solid #f1f5f9;
+      border-radius: var(--radius);
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    label:hover {
+      background: #f8fafc;
+      border-color: #dbeafe;
+    }
+
+    input[type="checkbox"] {
+      margin-right: 15px;
+      margin-top: 4px;
+      transform: scale(1.3);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* Butoane */
+    .btn-container {
+      display: flex;
+      gap: 10px;
+      margin-top: 30px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 20px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: var(--radius);
+      cursor: pointer;
+      flex: 1;
+      min-width: 150px;
+      transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+    button:hover { background: var(--primary-dark); }
+    button:active { transform: scale(0.98); }
+
+    button#learn-btn {
+      background: var(--warning);
+      color: #fff;
+    }
+    button#learn-btn:hover {
+      background: var(--warning-dark);
+    }
+
+    /* FEEDBACK VIZUAL */
+    .correct { color: var(--success); font-weight: bold; margin-top: 15px;}
+    .wrong { color: var(--danger); font-weight: bold; margin-top: 15px;}
+    .info { color: var(--warning-dark); font-weight: bold; margin-top: 15px;}
+
+    label.correct-answer {
+      background-color: #d1fae5;
+      border-color: #27ae60;
+      color: #064e3b;
+      border-left: 6px solid #27ae60;
+    }
+
+    label.wrong-answer {
+      background-color: #f06262;
+      border-color: #ef4444;
+      border-left: 6px solid #ef4444;
+      animation: shake 0.4s ease;
+    }
+
+    .hidden { display: none !important; }
+
+    .progress-container {
+      width: 100%;
+      max-width: 800px;
+      background: #e2e8f0;
+      height: 8px;
+      border-radius: 100px;
+      overflow: hidden;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 100;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--primary);
+      transition: width 0.3s ease;
+    }
+
+    .result-box { text-align: center; padding: 20px; }
+    .result-score { font-size: 3rem; font-weight: bold; color: var(--primary); margin: 20px 0; }
+    
+    .back-link {
+        text-decoration: none; 
+        color: #666; 
+        font-weight: bold; 
+        margin-bottom: 20px; 
+        display: inline-block;
+        padding: 5px 10px;
+        background: #eee;
+        border-radius: 8px;
+    }
+    .back-link:hover { background: #ddd; color: #333; }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    @media (max-width: 600px) {
+      .container { padding: 20px; margin-top: 10px; border-radius: 0; box-shadow: none; }
+      .header-stats { flex-direction: column; gap: 5px; text-align: center;}
+      .question p { font-size: 1.1rem; }
+      button { font-size: 15px; padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="progress-container">
+    <div class="progress-fill" id="progress"></div>
+  </div>
+
+  <div class="container">
+    <a href="index.html" class="back-link">⬅ Înapoi la Meniu</a>
+
+    <div class="header-stats">
+       <span>✅ Corecte: <span id="correct-count" class="score-badge" style="color:var(--success)">0</span></span>
+       <span>❌ Greșite: <span id="wrong-count" class="score-badge" style="color:var(--danger)">0</span></span>
+    </div>
+
+    <div id="quiz-area">
+      <div class="question-counter" id="question-counter"></div>
+      <div id="question-box" class="question"></div>
+      
+      <div id="feedback"></div>
+
+      <div class="btn-container">
+        <button id="learn-btn" onclick="showCorrectAnswer()">👀 Vezi Răspunsul</button>
+        <button id="submit-btn" onclick="submitAnswer()">Verifică Răspunsul</button>
+        <button id="next-btn" class="hidden" onclick="nextQuestion()">Următoarea ➡</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ÎNTREBĂRI MSP - Extrase din PDF */
+    const originalQuestions = [
+      {
+        question: "1. Biroul de Achizitii publice din cadrul Universitatii Tehnice este:",
+        answers: [
+          "a) un compartiment elementar care se constituie pentru indeplinirea unor lucrari sau activitati omogene si care necesita o activitate distincta;",
+          "b) un compartiment organizat distinct;",
+          "c) un spatiu ce poate avea cel mult 20 de posturi de munca ocupate;",
+          "d) un element component al structurii organizatorice."
+        ],
+        correct: [3] // d (cel mai general corect), posibil și b
+      },
+      {
+        question: "2. Utilizarea mijloacelor electronice in procesul de comunicare determina o serie de dezavantaje:",
+        answers: [
+          "a) este posibila numai intre cei care fac parte din retea;",
+          "b) poate crea dependenta;",
+          "c) se pot scurge informatii confidentiale;",
+          "d) au un cost foarte mare fata de alte canale de comunicare."
+        ],
+        correct: [1, 2] // b, c
+      },
+      {
+        question: "3. In anumite situatii, institutiile stabilesc unul sau mai multi purtatori de cuvant pentru relatiile cu presa, datorita:",
+        answers: [
+          "a) aversiunii sau fricii fata de presa;",
+          "b) aspectului fizic sau a starii de moment a sanatatii;",
+          "c) absenta unuia dintre ei din tara;",
+          "d) lipsei de timp a liderului unei institutii"
+        ],
+        correct: [3] // d
+      },
+      {
+        question: "4. Metodele utilizate in adoptarea deciziilor pot fi:",
+        answers: [
+          "a) de organizare;",
+          "b) traditionale;",
+          "c) de optimizare;",
+          "d) comparative."
+        ],
+        correct: [2] // c (metode de optimizare a deciziilor)
+      },
+      {
+        question: "5. Decidentul unei institutii publice este reprezentat de:",
+        answers: [
+          "a) un manager care adopta o decizie in virtutea obiectivelor competentelor sale;",
+          "b) presedintele grupului majoritar din coalitie;",
+          "c) un executant care hotaraste modul de actiune a activitatilor zilnice;",
+          "d) un organism managerial care, conform responsabilitatilor circumscrise ia decizia in situatia respectiva."
+        ],
+        correct: [0, 3] // a, d
+      },
+      {
+        question: "6. Care dintre urmatoarele caracteristici apartin modelului de comunicare Shannon-Weaver:",
+        answers: [
+          "a) comunicarea implica o buna coordonare a intelesurilor;",
+          "b) comunicarea este folosita in scopuri multiple;",
+          "c) comunicarea presupune capacitatea de a anticipa reactiile celorlalti;",
+          "d) receptorul percepe mesajul exact in forma si cu continutul dorit de emitator"
+        ],
+        correct: [3] // d (idealul modelului tehnic)
+      },
+      {
+        question: "7. Prin imaginea organizationala se distinge un concept complex constituit din urmatoarele elemente:",
+        answers: [
+          "a) responsabilitate sociala;",
+          "b) istoria organizatiei;",
+          "c) succesele si stabilitatea organizatiei din punct de vedere financiar;",
+          "d) calitatea ofertei sale si reputatia organizatiei."
+        ],
+        correct: [0, 1, 2, 3] // Toate contribuie la imagine
+      },
+      {
+        question: "8. Managerul public trebuie sa stabileasca in continutul unei decizii:",
+        answers: [
+          "a) modalitatea practica de actiune;",
+          "b) gradul de autonomie manifestat de executanti;",
+          "c) obiectivul urmarit;",
+          "d) locul si responsabilul aplicarii acesteia."
+        ],
+        correct: [0, 2, 3] // a, c, d
+      },
+      {
+        question: "9. Orice situatie decizionala presupune in mod obligatoriu:",
+        answers: [
+          "a) doua sau mai multe alternative de actiune care pot asigura realizarea obictivelor propuse;",
+          "b) cunoasterea anticipata a alternativei optime pentru atingerea obiectivelor;",
+          "c) cunoasterea calitatilor personale ale decidentilor;",
+          "d) unul sau mai multe obiective de atins."
+        ],
+        correct: [0, 3] // a, d
+      },
+      {
+        question: "10. La Institutia Prefectului din Bacau, managementul comunicarii se bazeaza pe planificarea relatiilor publice pe o serie de etape:",
+        answers: [
+          "a) planificarea, elaborarea mixului de relatii publice, programarea si evaluarea lor;",
+          "b) stabilirea obiectivelor generale;",
+          "c) formularea strategiilor;",
+          "d) identificarea problemei."
+        ],
+        correct: [0] // a (cuprinde tot procesul)
+      },
+      {
+        question: "11. Care dintre enunturile de mai jos reprezinta caracteristici importante ale deciziei manageriale:",
+        answers: [
+          "a) luarea unei decizii presupune o alegere a solutiei din mai multe variante posibile;",
+          "b) alegerea uneia dintre variante trebuie sa fie rezultatul unui act constient, deliberat al decidentilor;",
+          "c) evenimentele analizate logic se bazeaza pe experienta si intuitie;",
+          "d) alegerea unei solutii trebuie sa fie rezultatul unui act spontan."
+        ],
+        correct: [0, 1] // a, b
+      },
+      {
+        question: "12. In organizatiile publice, avantajele utilizarii 'postei' ca un canal de comunicare sunt:",
+        answers: [
+          "a) mesajele pot fi inregistrate permanent;",
+          "b) directia de transmitere a mesajelor este stabilita prin regulament;",
+          "c) mesajele sunt consecvente catre toti primitorii;",
+          "d) mesajele au un volum excesiv."
+        ],
+        correct: [0, 2] // a, c
+      },
+      {
+        question: "13. Structura organizationala a unei organizatii publice cuprinde urmatoarele componente:",
+        answers: [
+          "a) planurile decizionale;",
+          "b) compartimente cu rol de exprimare a diviziunii muncii in cadrul administratiei locale;",
+          "c) autoritatea si responsabilitatea angajatilor;", // a fost separat eronat în PDF, l-am unit
+          "d) relatiile ce se stabilesc intre compartimente."
+        ],
+        correct: [1, 2, 3] // b, c, d (posturi, compartimente, relații)
+      },
+      {
+        question: "14. In realizarea planului de relatii publice se pot incadra urmatoarele tipuri de activitati:",
+        answers: [
+          "a) lobby-ul;",
+          "b) organizarea de evenimente publice;",
+          "c) discursuri periodice in piete publice;", // unit cu varianta de sus
+          "d) publicitatea."
+        ],
+        correct: [0, 1, 3] // a, b, d
+      },
+      {
+        question: "15. Cele mai importante criterii de clasificare ale deciziilor utilizate in management sunt:",
+        answers: [
+          "a) dupa natura obiectivelor urmarite si orizontul de timp la care se refera;",
+          "b) dupa metodologia de elaborare si adoptare;",
+          "c) dupa sfera de competenta a managerului implicat in procesul de conducere;",
+          "d) dupa sfera de incompetenta a sefului direct."
+        ],
+        correct: [0, 1, 2] // a, b, c
+      },
+      {
+        question: "16. Care dintre urmatoarele definitii privind comunicarea sunt corecte:",
+        answers: [
+          "a) comunicarea verticala descendenta cuprinde fluxuri de informatii (mesaje) generate de managerii de la nivelurile cele mai inalte ale institutiei si adresate celor de la nivelurile inferioare;",
+          "b) comunicarea verticala descendenta apare intre persoane care ocupa pozitii situate la acelasi nivel ierarhic in sistemul de management;",
+          "c) comunicarea verticala descendenta cuprinde fluxuri de informatii (mesaje) generate de managerii de la nivelurile cele mai de jos ale institutiei si adresate celor de la nivelurile superioare."
+        ],
+        correct: [0] // a
+      },
+      {
+        question: "17. Orice decizie luata la un moment dat in organizatia publica presupune existenta unui mecanism din care fac parte mai multe sisteme:",
+        answers: [
+          "a) de evaluare si referinta;",
+          "b) de analiza;",
+          "c) de previziune;",
+          "d) de masurare a performantelor."
+        ],
+        correct: [0, 1, 2, 3] // Toate sunt necesare
+      },
+      {
+        question: "18. Construirea alternativelor de decizie este o etapa in care:",
+        answers: [
+          "a) sunt invitati toti cetatenii unei comunitati;",
+          "b) sunt cercetate si se analizeaza consecintele posibile ale fiecarei alternative;",
+          "c) sunt stabilite, studiate si previzionate consecintele mai multor variante;",
+          "d) se pregateste momentul deciziei."
+        ],
+        correct: [1, 2] // b, c
+      },
+      {
+        question: "19. Mediul ambiant decizional consta in:",
+        answers: [
+          "a) rezolvarea unei probleme pentru care exista foarte multe solutii;",
+          "b) ansamblul elementelor interne si externe din organizatie care alcatuiesc situatia decizionala;",
+          "c) suma de influente directe si indirecte semnificative legate de continutul si rezultatele deciziei manageriale;",
+          "d) integrarea schimbarilor din mediul de actiune al managerilor in activitatile lor personale."
+        ],
+        correct: [1, 2] // b, c
+      },
+      {
+        question: "20. Caracterizati 'comunicarea in fata unui auditoriu' selectind dintre urmatoarele aspecte enumerate in continuare:",
+        answers: [
+          "a) presupune prezenta obligatorie a tuturor angajatilor;",
+          "b) este o forma a comunicarii in grup;",
+          "c) permite identificarea problemelor care determina disfunctionalitatile din organizatie;",
+          "d) are ca scop formarea unei imagini proprii, a grupului sau a organizatiei."
+        ],
+        correct: [1, 3] // b, d
+      },
+      {
+        question: "21. Structura oricarei unitati a administratiei publice este reprezentata grafic prin organigrame simbolizate astfel:",
+        answers: [
+          "a) casute dreptunghiulare - posturile de executie, compartimentele de productie sau servire si clienti;",
+          "b) linii - care evidentiaza relatiile de control intre compartimente;",
+          "c) linii - care evidentiaza relatiile dintre compartimente;",
+          "d) casute dreptunghiulare - posturi de conducere si compartimentele functionale de pe diferite niveluri ierarhice."
+        ],
+        correct: [0, 2, 3] // a, c, d
+      },
+      {
+        question: "22. In orice proces decizional trebuie sa fie respectate cerintele enumerate mai jos:",
+        answers: [
+          "a) deciziile trebuie sa fie imputernicite si legale;",
+          "b) deciziile adoptate de manageri trebuie sa devina aplicabile dupa o perioada de gratie de 6 luni;",
+          "c) deciziile si dispozitiile ce decurg din activitatea managerilor sunt transmise executantilor fara a avea interpretari diferite;",
+          "d) deciziile trebuie sa fie fundamentate stiintific ori de cate ori este posibil si recomandabil."
+        ],
+        correct: [0, 2, 3] // a, c, d
+      },
+      {
+        question: "23. Intr-o configuratie structurala, 'functiile' pot fi:",
+        answers: [
+          "a) manageriale si de executie;",
+          "b) pozitiile succesive pe care le au fata de conducerea superioara, managerii compartimentelor situate la aceeasi distanta ierarhica;",
+          "c) totalitatea posturilor care prezinta aceleasi caracteristici principale;",
+          "d) totalitatea posturilor care prezinta caracteristici principale absolut complementare."
+        ],
+        correct: [0, 2] // a, c
+      },
+      {
+        question: "24. Comunicarea orizontala apare in cadrul unei organizatii publice:",
+        answers: [
+          "a) intre persoane care ocupa pozitii situate la acelasi nivel ierarhic in sistemul de management;",
+          "b) atunci cand este necesara coordonarea diverselor functii ale organizatiei;",
+          "c) intre persoane care ocupa pozitii situate la niveluri ierarhice diferite in sistemul de management;",
+          "d) intre persoane intre care exista relatii organizatorice de cooperare."
+        ],
+        correct: [0, 1, 3] // a, b, d
+      },
+      {
+        question: "25. Unele institutii publice utilizeaza 'adresarea orala' care poate avea ca forme specifice importante:",
+        answers: [
+          "a) raportul final;",
+          "b) raportul managerilor;",
+          "c) raportul de situatie;",
+          "d) briefingul."
+        ],
+        correct: [3] // d
+      },
+      {
+        question: "26. Criteriile ce trebuie avute in vedere in procesul alegerii ca decizie optima, a uneia dintre variantele prezentate decidentilor sunt:",
+        answers: [
+          "a) implicarea rasunderii si asumarea unui risc;",
+          "b) economia de resurse;",
+          "c) rolul comunitatii in urmarirea efectelor asteptate;",
+          "d) importanta deosebita a factorului uman."
+        ],
+        correct: [0, 1, 3] // a, b, d (eficienta, eficacitate)
+      },
+      {
+        question: "27. Cele mai importante caracterstici ale relatiilor publice sunt:",
+        answers: [
+          "a) planificarea;",
+          "b) dimensiunea marginala;",
+          "c) performanta;",
+          "d) deliberarea."
+        ],
+        correct: [0, 2, 3] // a, c, d
+      },
+      {
+        question: "28. In categoria situatiilor de criza in care sunt obligate sa se implice organizatiile publice se pot incadra:",
+        answers: [
+          "a) accidentele grave aviatice, maritime sau terestre;",
+          "b) evenimentele social-politice (greve, miscari sociale de presiune a strazii, schimbarea subita a echipei de conducere);",
+          "c) prezentarea noului Prefect numit de primul-ministru la Vaslui;",
+          "d) catastrofele naturale (cutremure, inudatii)."
+        ],
+        correct: [0, 1, 3] // a, b, d
+      },
+      {
+        question: "29. Fiecare angajat al unei institutii publice trebuie sa participe la stagii de insusire a unor tehnici de comunicare eficienta in situatii de criza, la nivelul:",
+        answers: [
+          "a) prezentarii institutiei in relatiile cu presa;",
+          "b) prezentarii institutiei in relatiile cu partenerii straini;",
+          "c) interpresonal;",
+          "d) autoprezentarii."
+        ],
+        correct: [2, 3] // c, d (la nivel individual)
+      },
+      {
+        question: "30. Prin controlul gradului de indeplinire a unei decizii in cadrul Primariei Iasi se urmareste:",
+        answers: [
+          "a) stabilirea unui program concret de actiune;",
+          "b) implicarea raspunderii si riscului executantilor si utilizatorilor;",
+          "c) formularea unor dispozitii, ordine, insstructiuni;",
+          "d) determinarea cauzelor care au generat eventuale abateri de la program si de la rezultate asteptate."
+        ],
+        correct: [3] // d (definiția controlului)
+      },
+      {
+        question: "31. Printre elementele componente ale imaginii organizationale sunt identificate:",
+        answers: [
+          "a) afacerile private ale managerilor;",
+          "b) afacerile publice;",
+          "c) consultanta;",
+          "d) identitatea."
+        ],
+        correct: [3] // d (identitatea este nucleul imaginii)
+      },
+      {
+        question: "32. Care dintre enunturile de mai jos constituie caracteristicile importante in adoptarea deciziei manageriale:",
+        answers: [
+          "a) presupune existenta unui obiectiv masurabil si precis determinat;",
+          "b) este necesara utilizarea unui mare volum de informatii care sa reflecte concomitent realitatea;",
+          "c) decizia trebuie sa fie rezultatul unui proces decizional rational;",
+          "d) continutul deciziei cuprinde una, doua sau mai multe variante de actiune."
+        ],
+        correct: [0, 1, 2, 3] // Toate
+      },
+      {
+        question: "33. Relatiile (legaturile) structurale se stabilesc penrtu o organizatie publica:",
+        answers: [
+          "a) intre compartimente sau salariatii investiti cu autoritate formala;",
+          "b) in cazul in care comunicarea informatiilor este reglementata juridic;",
+          "c) ca urmare a necesitatii comunicarii intre compartimente;",
+          "d) intre compartimente sau salariatii din organizatii publice diferite ale comunitatii."
+        ],
+        correct: [0, 2] // a, c
+      },
+      {
+        question: "34. Structura organizatorica a unei institutii publice locale reprezinta:",
+        answers: [
+          "a) legaturile care se stabilesc intre ele in scopul atingerii obiectivelor;",
+          "b) ansamblul persoanelor si compartimentelor functionale si modul in care sunt constituite;",
+          "c) nivelul rezultatelor programate de sefii institutiei publice pentru un an;",
+          "d) numarul de activitati planificate anual de catre conducere."
+        ],
+        correct: [1] // b
+      },
+      {
+        question: "35. Activitatea de lobby in cazul unei organizatii publice:",
+        answers: [
+          "a) are ca scop influentarea deciziilor puterii (Presedinte, Guvern, Parlament);",
+          "b) este o forma de manifestare a procesului decizional;",
+          "c) se realizeaza prin mijloacele specifice relatiilor publice;",
+          "d) se desfasoara pentru luarea in discutie a unor probleme de interes public."
+        ],
+        correct: [0, 2, 3] // a, c, d
+      }
+    ];
+
+    let questions = []; 
+    let correctAnswersCount = 0;
+    let wrongAnswersCount = 0;
+    let currentQuestion = 0;
+
+    function initQuiz() {
+      questions = [...originalQuestions]; 
+      
+      currentQuestion = 0;
+      correctAnswersCount = 0;
+      wrongAnswersCount = 0;
+      updateScore();
+      
+      document.getElementById("quiz-area").innerHTML = `
+        <div class="question-counter" id="question-counter"></div>
+        <div id="question-box" class="question"></div>
+        <div id="feedback"></div>
+        <div class="btn-container">
+          <button id="learn-btn" onclick="showCorrectAnswer()">👀 Vezi Răspunsul</button>
+          <button id="submit-btn" onclick="submitAnswer()">Verifică Răspunsul</button>
+          <button id="next-btn" class="hidden" onclick="nextQuestion()">Următoarea ➡</button>
+        </div>
+      `;
+      
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      window.scrollTo(0, 0);
+
+      const q = questions[currentQuestion];
+      const box = document.getElementById("question-box");
+      const feedback = document.getElementById("feedback");
+      const counter = document.getElementById("question-counter");
+
+      feedback.innerHTML = "";
+      document.getElementById("next-btn").classList.add("hidden");
+      document.getElementById("submit-btn").classList.remove("hidden");
+      document.getElementById("learn-btn").classList.remove("hidden");
+      
+      counter.innerText = `Întrebarea ${currentQuestion + 1} din ${questions.length}`;
+
+      // Eliminare numerotare hardcodata din text (ex "1.Intrebare" -> "Intrebare")
+      const cleanQuestionText = q.question.replace(/^\d+\.\s*/, '');
+      let html = `<p>${cleanQuestionText}</p>`;
+      
+      q.answers.forEach((answer, i) => {
+        html += `
+          <label>
+            <input type="checkbox" name="answer" value="${i}"> 
+            <span>${answer}</span>
+          </label>`;
+      });
+
+      box.innerHTML = html;
+      updateProgress();
+    }
+
+    function showCorrectAnswer() {
+      const correct = questions[currentQuestion].correct;
+      const checkboxes = document.querySelectorAll('input[name="answer"]');
+
+      checkboxes.forEach(cb => {
+        const idx = parseInt(cb.value);
+        const label = cb.closest('label');
+
+        if (correct.includes(idx)) {
+          label.classList.add('correct-answer');
+          cb.checked = true; 
+        }
+        cb.disabled = true; 
+      });
+
+      document.getElementById("submit-btn").classList.add("hidden");
+      document.getElementById("learn-btn").classList.add("hidden");
+      document.getElementById("next-btn").classList.remove("hidden");
+      document.getElementById("feedback").innerHTML = `<p class="info">👁️ Mod învățare activat. Răspunsul nu a fost punctat.</p>`;
+    }
+
+    function submitAnswer() {
+      const selected = Array.from(document.querySelectorAll('input[name="answer"]:checked'))
+        .map(el => parseInt(el.value))
+        .sort((a, b) => a - b);
+
+      if (selected.length === 0) {
+        alert("Te rog selectează cel puțin un răspuns!");
+        return;
+      }
+
+      const correct = questions[currentQuestion].correct.slice().sort((a, b) => a - b);
+      const feedback = document.getElementById("feedback");
+      const nextBtn = document.getElementById("next-btn");
+      const learnBtn = document.getElementById("learn-btn");
+
+      let isCorrect = arraysEqual(selected, correct);
+
+      if (isCorrect) {
+        correctAnswersCount++;
+        feedback.innerHTML = `<p class="correct">✔️ Corect!</p>`;
+      } else {
+        wrongAnswersCount++;
+        feedback.innerHTML = `<p class="wrong">❌ Greșit.</p>`;
+      }
+      
+      updateScore();
+
+      document.getElementById("submit-btn").classList.add("hidden");
+      learnBtn.classList.add("hidden");
+      nextBtn.classList.remove("hidden");
+
+      const checkboxes = document.querySelectorAll('input[name="answer"]');
+      checkboxes.forEach(cb => {
+        const idx = parseInt(cb.value);
+        const label = cb.closest('label');
+
+        // VERDE PENTRU CORECT
+        if (correct.includes(idx)) {
+          label.classList.add('correct-answer');
+          if(!cb.checked) cb.checked = true; 
+        }
+
+        // ROȘU PENTRU GREȘEALĂ
+        if (cb.checked && !correct.includes(idx)) {
+          label.classList.add('wrong-answer');
+        }
+
+        cb.disabled = true;
+      });
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        loadQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+      const percentage = Math.round((correctAnswersCount / questions.length) * 100);
+      let message = "";
+      if (percentage >= 90) message = "Excelent! 🏆";
+      else if (percentage >= 70) message = "Foarte bine! 👏";
+      else if (percentage >= 50) message = "Bun! 👍";
+      else message = "Mai exersează! 📚";
+
+      const quizArea = document.getElementById("quiz-area");
+      quizArea.innerHTML = `
+        <div class="result-box">
+          <h2>Test Terminat!</h2>
+          <p>${message}</p>
+          <div class="result-score">${correctAnswersCount} / ${questions.length}</div>
+          <p>Scor: ${percentage}%</p>
+          <button onclick="initQuiz()" style="margin-top:20px;">🔄 Reîncepe Testul</button>
+        </div>
+      `;
+      document.getElementById("progress").style.width = "100%";
+    }
+
+    function updateProgress() {
+      const progress = document.getElementById("progress");
+      const percent = ((currentQuestion) / questions.length) * 100;
+      progress.style.width = percent + "%";
+    }
+
+    function updateScore() {
+      document.getElementById("correct-count").textContent = correctAnswersCount;
+      document.getElementById("wrong-count").textContent = wrongAnswersCount;
+    }
+
+    function arraysEqual(a, b) {
+      if (a.length !== b.length) return false;
+      for (let i = 0; i < a.length; i++) {
+        if (a[i] !== b[i]) return false;
+      }
+      return true;
+    }
+
+    initQuiz();
+  </script>
+</body>
+</html>
