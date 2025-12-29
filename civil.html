@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <title>Grile Drept Civil</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <style>
+    :root {
+      --primary: #2f80ed;
+      --primary-dark: #1c60bd;
+      --warning: #f59e0b;
+      --warning-dark: #d97706;
+      --bg: #f8fafc;
+      --text: #333;
+      --card-bg: #ffffff;
+      --border: #e0e0e0;
+      --success: #27ae60;
+      --danger: #c0392b;
+      --radius: 12px;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      padding: 30px;
+      max-width: 800px;
+      width: 100%;
+      position: relative;
+      margin-top: 20px;
+      margin-bottom: 40px;
+    }
+
+    .header-stats {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      font-size: 0.95rem;
+      color: #555;
+      background: #f1f5f9;
+      padding: 10px 15px;
+      border-radius: 8px;
+    }
+
+    .score-badge { font-weight: bold; }
+    
+    .question-counter {
+      font-size: 0.9rem;
+      color: #888;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .question p {
+      font-size: 1.25rem;
+      line-height: 1.5;
+      color: var(--text);
+      font-weight: 600;
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: flex;
+      align-items: flex-start;
+      padding: 14px 16px;
+      background: #fff;
+      border: 2px solid #f1f5f9;
+      border-radius: var(--radius);
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    label:hover {
+      background: #f8fafc;
+      border-color: #dbeafe;
+    }
+
+    input[type="checkbox"] {
+      margin-right: 15px;
+      margin-top: 4px;
+      transform: scale(1.3);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* Butoane */
+    .btn-container {
+      display: flex;
+      gap: 10px;
+      margin-top: 30px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 20px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: var(--radius);
+      cursor: pointer;
+      flex: 1;
+      min-width: 150px;
+      transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+    button:hover { background: var(--primary-dark); }
+    button:active { transform: scale(0.98); }
+
+    button#learn-btn {
+      background: var(--warning);
+      color: #fff;
+    }
+    button#learn-btn:hover {
+      background: var(--warning-dark);
+    }
+
+    /* FEEDBACK VIZUAL */
+    .correct { color: var(--success); font-weight: bold; margin-top: 15px;}
+    .wrong { color: var(--danger); font-weight: bold; margin-top: 15px;}
+    .info { color: var(--warning-dark); font-weight: bold; margin-top: 15px;}
+
+    /* STIL PENTRU RĂSPUNS CORECT (VERDE) */
+    label.correct-answer {
+      background-color: #d1fae5; /* Verde deschis fundal */
+      border-color: #27ae60;     /* Verde contur */
+      color: #064e3b;            /* Verde închis text */
+      border-left: 6px solid #27ae60; /* Bară groasă stânga */
+    }
+
+    /* STIL PENTRU RĂSPUNS GREȘIT BIFAT (ROȘU) */
+    label.wrong-answer {
+      background-color: #f06868;
+      border-color: #ef4444;
+      border-left: 6px solid #ef4444;
+      animation: shake 0.4s ease;
+    }
+
+    .hidden { display: none !important; }
+
+    .progress-container {
+      width: 100%;
+      max-width: 800px;
+      background: #e2e8f0;
+      height: 8px;
+      border-radius: 100px;
+      overflow: hidden;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 100;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--primary);
+      transition: width 0.3s ease;
+    }
+
+    .result-box { text-align: center; padding: 20px; }
+    .result-score { font-size: 3rem; font-weight: bold; color: var(--primary); margin: 20px 0; }
+    
+    .back-link {
+        text-decoration: none; 
+        color: #666; 
+        font-weight: bold; 
+        margin-bottom: 20px; 
+        display: inline-block;
+        padding: 5px 10px;
+        background: #eee;
+        border-radius: 8px;
+    }
+    .back-link:hover { background: #ddd; color: #333; }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    @media (max-width: 600px) {
+      .container { padding: 20px; margin-top: 10px; border-radius: 0; box-shadow: none; }
+      .header-stats { flex-direction: column; gap: 5px; text-align: center;}
+      .question p { font-size: 1.1rem; }
+      button { font-size: 15px; padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="progress-container">
+    <div class="progress-fill" id="progress"></div>
+  </div>
+
+  <div class="container">
+    <a href="index.html" class="back-link">⬅ Înapoi la Meniu</a>
+
+    <div class="header-stats">
+       <span>✅ Corecte: <span id="correct-count" class="score-badge" style="color:var(--success)">0</span></span>
+       <span>❌ Greșite: <span id="wrong-count" class="score-badge" style="color:var(--danger)">0</span></span>
+    </div>
+
+    <div id="quiz-area">
+      <div class="question-counter" id="question-counter"></div>
+      <div id="question-box" class="question"></div>
+      
+      <div id="feedback"></div>
+
+      <div class="btn-container">
+        <button id="learn-btn" onclick="showCorrectAnswer()">👀 Vezi Răspunsul</button>
+        <button id="submit-btn" onclick="submitAnswer()">Verifică Răspunsul</button>
+        <button id="next-btn" class="hidden" onclick="nextQuestion()">Următoarea ➡</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const originalQuestions = [
+      {
+        question: "1. Dreptul de proprietate privată",
+        answers: [
+          "a) este inalienabil",
+          "b) nu poate avea ca titular statul",
+          "c) se poate transmite prin vânzare"
+        ],
+        correct: [2] 
+      },
+      {
+        question: "2. Capacitatea de folosință a persoanei fizice începe",
+        answers: [
+          "a) în momentul dobândirii capacității de exercițiu",
+          "b) la naşterea persoanei",
+          "c) în momentul împlinirii vârstei de 18 ani"
+        ],
+        correct: [1]
+      },
+      {
+        question: "3. Au capacitate de exercițiu restrânsă",
+        answers: [
+          "a) interzisul judecătoresc",
+          "b) minorul care nu a împlinit 14 ani",
+          "c) minorul căsătorit în condițiile legii"
+        ],
+        correct: [0, 1] 
+      },
+      {
+        question: "4. Accesiunea imobiliară artificială",
+        answers: [
+          "a) unirea bunurilor se produce la intervenția omului",
+          "b) este un mod de dobândire a proprietății",
+          "c) constă în unirea a două bunuri mobile"
+        ],
+        correct: [0, 1]
+      },
+      {
+        question: "5. Sancțiunea nerespectării condițiilor de formă ale testamentelor este",
+        answers: [
+          "a) amendă civilă",
+          "b) nulitatea absolută",
+          "c) inopozabilitatea"
+        ],
+        correct: [1]
+      },
+      {
+        question: "6. Sunt cauze de nulitate",
+        answers: [
+          "a) nerespectarea formei notariale",
+          "b) lipsa capacității de exercițiu",
+          "c) lipsa ori nevalabilitatea consimțământului"
+        ],
+        correct: [0, 1, 2]
+      },
+      {
+        question: "7. Capacitatea deplină de exercițiu",
+        answers: [
+          "a) incepe la nasterea persoanei fizice",
+          "b) spre deosebire de capacitatea de folosinta, inceteaza la data mortii persoanei fizice",
+          "c) începe în toate cazurile la data când persoana devine majoră"
+        ],
+        correct: [1, 2]
+      },
+      {
+        question: "8. În ceea ce priveşte obiectul actului juridic civil",
+        answers: [
+          "a) acesta poate fi și un bun viitor determinat",
+          "b) inexistenţa acestuia atrage nulitatea",
+          "c) acesta este o condiție esențială"
+        ],
+        correct: [0, 1, 2]
+      },
+      {
+        question: "9. Data deschiderii moştenirii",
+        answers: [
+          "a) în cazul în care sunt mai mulți moştenitori, acest moment marchează începerea stării de indiviziune între ei",
+          "b) din acest moment actele asupra moştenirii nu devin valabile",
+          "c) este momentul de la care se calculează renunţarea şi acceptarea moştenirii"
+        ],
+        correct: [0, 2]
+      },
+      {
+        question: "10. Conținutul principiului reparării integrale a prejudiciului este dat de următoarele aspecte",
+        answers: [
+          "a) în stabilirea despăgubirilor are relevanță starea materială a victimei",
+          "b) prejudiciul se repară parţial",
+          "c) sunt supuse reparării atât pierderea suferită, cât şi beneficiul nerealizat"
+        ],
+        correct: [2]
+      },
+      {
+        question: "11. Persoana juridică poate fi reorganizată prin",
+        answers: [
+          "a) fuziune",
+          "b) absorbție",
+          "c) divizare"
+        ],
+        correct: [0, 1, 2]
+      },
+      {
+        question: "12. Consimţământul",
+        answers: [
+          "a) ca o condiție esențială, trebuie să fie nealterat de vreun viciu",
+          "b) poate fi afectat de eroare insa actul juridic incheiat sa fie valabil",
+          "c) trebuie sa provina de la o persoana cu discernamant"
+        ],
+        correct: [0, 2]
+      },
+      {
+        question: "13. Viciile posesiei sunt",
+        answers: [
+          "a) discontinuitatea",
+          "b) violența",
+          "c) clandestinitatea"
+        ],
+        correct: [0, 1, 2]
+      },
+      {
+        question: "14. Constituie atribute de identificare a persoanei fizice",
+        answers: [
+          "a) starea civilă",
+          "b) sediul",
+          "c) numele"
+        ],
+        correct: [0, 2]
+      },
+      {
+        question: "15. Testamentul poate fi",
+        answers: [
+          "a) mistic",
+          "b) autentic",
+          "c) olograf"
+        ],
+        correct: [1, 2]
+      },
+      {
+        question: "16. Testamentul olograf",
+        answers: [
+          "a) este scris în întregime de mână de către testator",
+          "b) este un testament scris la calculator",
+          "c) trebuie să conțină semnăturile martorilor"
+        ],
+        correct: [0]
+      },
+      {
+        question: "17. Cel care a cauzat un prejudiciu",
+        answers: [
+          "a) este răspunzător chiar şi dacă fapta a fost provocată într-un caz de forță majoră",
+          "b) este răspunzător chiar dacă nu a avut discernământ la momentul săvârşirii faptei",
+          "c) este răspunzător dacă în momentul săvârşirii faptei pagubitoare se afla în stare de beție provocată de el însuşi"
+        ],
+        correct: [2]
+      },
+      {
+        question: "18. Sunt condiții ale actului juridic civil",
+        answers: [
+          "a) discernământul",
+          "b) obiectul",
+          "c) părțile"
+        ],
+        correct: [0, 1]
+      },
+      {
+        question: "19. În situația răspunderii pentru fapta minorului, victima prejudiciului trebuie să facă dovada cu privire la",
+        answers: [
+          "a) raportul de cauzalitate dintre faptă şi prejudiciu",
+          "b) existența prejudiciului",
+          "c) existența faptei ilicite a minorului"
+        ],
+        correct: [0, 1, 2]
+      },
+      {
+        question: "20. Cauzele care înlătură vinovăţia sunt",
+        answers: [
+          "a) cazul fortuit",
+          "b) un dezastru provocat de un fenomen natural",
+          "c) forța majoră"
+        ],
+        correct: [0, 1, 2]
+      },
+      {
+        question: "21. În dreptul civil român, posesia",
+        answers: [
+          "a) este o stare de fapt",
+          "b) nu produce efecte juridice",
+          "c) este o stare de drept"
+        ],
+        correct: [0]
+      },
+      {
+        question: "22. Testamentul este",
+        answers: [
+          "a) o hotărâre judecătorească",
+          "b) un contract",
+          "c) un act unilateral"
+        ],
+        correct: [2]
+      },
+      {
+        question: "23. Data deschiderii moştenirii",
+        answers: [
+          "a) din acest moment, actele asupra moştenirii nu devin valabile",
+          "b) este momentul de la care se calculează renunţarea și acceptarea",
+          "c) în cazul în care sunt mai mulți moştenitori, acest moment marchează începerea stării de indiviziune"
+        ],
+        correct: [1, 2]
+      },
+      {
+        question: "24. Voinţa celui care încheie un testament",
+        answers: [
+          "a) trebuie să fie viciată",
+          "b) trebuie să fie liber exprimată",
+          "c) trebuie să rămână neexprimată"
+        ],
+        correct: [1]
+      },
+      {
+        question: "25. Pentru a produce efecte, posesia trebuie să aibă următoarele calități",
+        answers: [
+          "a) clandestinitate",
+          "b) continuitate",
+          "c) violență"
+        ],
+        correct: [1]
+      },
+      {
+        question: "26. În cazul testamentului autentic",
+        answers: [
+          "a) acesta poate fi redactat de către notarul public",
+          "b) poate fi redactat de testator şi autentificat de notarul public",
+          "c) testatorul trebuie să se prezinte personal la notariat pentru autentificare"
+        ],
+        correct: [0, 1, 2]
+      },
+      {
+        question: "27. Legitima apărare",
+        answers: [
+          "a) se aplică doar în stare de necesitate",
+          "b) este un principiu al reparării prejudiciului",
+          "c) este o cauză care înlătură caracterul ilicit al faptei"
+        ],
+        correct: [2]
+      },
+      {
+        question: "28. Dolul",
+        answers: [
+          "a) trebuie să fie determinant pentru încheierea actului juridic",
+          "b) conduce la anularea actului",
+          "c) poate proveni și de la un terț"
+        ],
+        correct: [0, 1, 2]
+      },
+      {
+        question: "29. Intenția directă",
+        answers: [
+          "a) poate îmbrăca și forma culpei",
+          "b) este o formă de vinovăţie",
+          "c) este întotdeauna necesară pentru a atrage răspunderea delictuală"
+        ],
+        correct: [1]
+      },
+      {
+        question: "30. Capacitatea de a încheia acte juridice",
+        answers: [
+          "a) presupune întotdeauna existenţa discernământului",
+          "b) este o excepție prevăzută expres de lege",
+          "c) este o stare de fapt de natură psihologică"
+        ],
+        correct: [0] 
+      },
+      {
+        question: "31. Pentru a putea veni la moştenire, moştenitorul trebuie",
+        answers: [
+          "a) să nu fie nedemn",
+          "b) să aibă vocație la moştenire",
+          "c) să aibă capacitate succesorală"
+        ],
+        correct: [0, 1, 2]
+      },
+      {
+        question: "32. Declararea judecătorească a morţii poate interveni",
+        answers: [
+          "a) la cererea oricărei persoane interesate",
+          "b) dacă au trecut cel puțin 2 ani de la primirea ultimelor informații din care rezultă că era în viață",
+          "c) în cazul în care o persoană este dispărută și există indicii că a încetat din viață"
+        ],
+        correct: [0, 1, 2]
+      },
+      {
+        question: "33. Bunurile proprietate publică sunt bunurile",
+        answers: [
+          "a) din domeniul privat al statului",
+          "b) imobile sau mobile care aparţin unui minister",
+          "c) din domeniul public al statului şi al unităților administrativ-teritoriale"
+        ],
+        correct: [2]
+      },
+      {
+        question: "34. Dreptul de proprietate se poate dobândi prin",
+        answers: [
+          "a) uzucapiune",
+          "b) furt",
+          "c) moştenire"
+        ],
+        correct: [0, 2]
+      }
+    ];
+
+    let questions = []; 
+    let correctAnswersCount = 0;
+    let wrongAnswersCount = 0;
+    let currentQuestion = 0;
+
+    function initQuiz() {
+      // Păstrăm ordinea originală (fără shuffle)
+      questions = [...originalQuestions]; 
+      
+      currentQuestion = 0;
+      correctAnswersCount = 0;
+      wrongAnswersCount = 0;
+      updateScore();
+      
+      document.getElementById("quiz-area").innerHTML = `
+        <div class="question-counter" id="question-counter"></div>
+        <div id="question-box" class="question"></div>
+        <div id="feedback"></div>
+        <div class="btn-container">
+          <button id="learn-btn" onclick="showCorrectAnswer()">👀 Vezi Răspunsul</button>
+          <button id="submit-btn" onclick="submitAnswer()">Verifică Răspunsul</button>
+          <button id="next-btn" class="hidden" onclick="nextQuestion()">Următoarea ➡</button>
+        </div>
+      `;
+      
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      window.scrollTo(0, 0);
+
+      const q = questions[currentQuestion];
+      const box = document.getElementById("question-box");
+      const feedback = document.getElementById("feedback");
+      const counter = document.getElementById("question-counter");
+
+      feedback.innerHTML = "";
+      document.getElementById("next-btn").classList.add("hidden");
+      document.getElementById("submit-btn").classList.remove("hidden");
+      document.getElementById("learn-btn").classList.remove("hidden");
+      
+      counter.innerText = `Întrebarea ${currentQuestion + 1} din ${questions.length}`;
+
+      const cleanQuestionText = q.question.replace(/^\d+\.\s*/, '');
+      let html = `<p>${cleanQuestionText}</p>`;
+      
+      q.answers.forEach((answer, i) => {
+        html += `
+          <label>
+            <input type="checkbox" name="answer" value="${i}"> 
+            <span>${answer}</span>
+          </label>`;
+      });
+
+      box.innerHTML = html;
+      updateProgress();
+    }
+
+    function showCorrectAnswer() {
+      const correct = questions[currentQuestion].correct;
+      const checkboxes = document.querySelectorAll('input[name="answer"]');
+
+      checkboxes.forEach(cb => {
+        const idx = parseInt(cb.value);
+        const label = cb.closest('label');
+
+        if (correct.includes(idx)) {
+          label.classList.add('correct-answer');
+          cb.checked = true; 
+        }
+        cb.disabled = true; 
+      });
+
+      document.getElementById("submit-btn").classList.add("hidden");
+      document.getElementById("learn-btn").classList.add("hidden");
+      document.getElementById("next-btn").classList.remove("hidden");
+      document.getElementById("feedback").innerHTML = `<p class="info">👁️ Mod învățare activat. Răspunsul nu a fost punctat.</p>`;
+    }
+
+    function submitAnswer() {
+      const selected = Array.from(document.querySelectorAll('input[name="answer"]:checked'))
+        .map(el => parseInt(el.value))
+        .sort((a, b) => a - b);
+
+      if (selected.length === 0) {
+        alert("Te rog selectează cel puțin un răspuns!");
+        return;
+      }
+
+      const correct = questions[currentQuestion].correct.slice().sort((a, b) => a - b);
+      const feedback = document.getElementById("feedback");
+      const nextBtn = document.getElementById("next-btn");
+      const learnBtn = document.getElementById("learn-btn");
+
+      let isCorrect = arraysEqual(selected, correct);
+
+      if (isCorrect) {
+        correctAnswersCount++;
+        feedback.innerHTML = `<p class="correct">✔️ Corect!</p>`;
+      } else {
+        wrongAnswersCount++;
+        feedback.innerHTML = `<p class="wrong">❌ Greșit.</p>`;
+      }
+      
+      updateScore();
+
+      document.getElementById("submit-btn").classList.add("hidden");
+      learnBtn.classList.add("hidden");
+      nextBtn.classList.remove("hidden");
+
+      const checkboxes = document.querySelectorAll('input[name="answer"]');
+      checkboxes.forEach(cb => {
+        const idx = parseInt(cb.value);
+        const label = cb.closest('label');
+
+        // ACEASTA ESTE SECȚIUNEA CARE ÎNVERZEȘTE RĂSPUNSUL CORECT
+        if (correct.includes(idx)) {
+          label.classList.add('correct-answer');
+          if(!cb.checked) cb.checked = true; 
+        }
+
+        if (cb.checked && !correct.includes(idx)) {
+          label.classList.add('wrong-answer');
+        }
+
+        cb.disabled = true;
+      });
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        loadQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+      const percentage = Math.round((correctAnswersCount / questions.length) * 100);
+      let message = "";
+      if (percentage >= 90) message = "Excelent! 🏆";
+      else if (percentage >= 70) message = "Foarte bine! 👏";
+      else if (percentage >= 50) message = "Bun! 👍";
+      else message = "Mai exersează! 📚";
+
+      const quizArea = document.getElementById("quiz-area");
+      quizArea.innerHTML = `
+        <div class="result-box">
+          <h2>Test Terminat!</h2>
+          <p>${message}</p>
+          <div class="result-score">${correctAnswersCount} / ${questions.length}</div>
+          <p>Scor: ${percentage}%</p>
+          <button onclick="initQuiz()" style="margin-top:20px;">🔄 Reîncepe Testul</button>
+        </div>
+      `;
+      document.getElementById("progress").style.width = "100%";
+    }
+
+    function updateProgress() {
+      const progress = document.getElementById("progress");
+      const percent = ((currentQuestion) / questions.length) * 100;
+      progress.style.width = percent + "%";
+    }
+
+    function updateScore() {
+      document.getElementById("correct-count").textContent = correctAnswersCount;
+      document.getElementById("wrong-count").textContent = wrongAnswersCount;
+    }
+
+    function arraysEqual(a, b) {
+      if (a.length !== b.length) return false;
+      for (let i = 0; i < a.length; i++) {
+        if (a[i] !== b[i]) return false;
+      }
+      return true;
+    }
+
+    initQuiz();
+  </script>
+</body>
+</html>
