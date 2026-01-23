@@ -748,6 +748,7 @@
 
     let currentQ = 0;
     let correctCount = 0;
+    let totalScore = 0;
     let streak = 0;
     let isAnswered = false;
 
@@ -811,15 +812,31 @@
       }
     }
 
-    function checkAnswer() {
+function checkAnswer() {
       const checked = Array.from(document.querySelectorAll('input[name="ans"]:checked'));
       if (checked.length === 0) return; 
 
       isAnswered = true;
-      const userIdx = checked.map(c => parseInt(c.value)).sort();
-      const correctIdx = questions[currentQ].correct.slice().sort();
+      const userIdx = checked.map(c => parseInt(c.value));
+      const correctIdx = questions[currentQ].correct;
+      let correctSelected = 0;
+      let wrongSelected = 0;
 
-      const isCorrect = JSON.stringify(userIdx) === JSON.stringify(correctIdx);
+      userIdx.forEach(idx => {
+        if (correctIdx.includes(idx)) {
+          correctSelected++;
+        } else {
+          wrongSelected++;
+        }
+      });
+
+      let ratio = (correctSelected - wrongSelected) / correctIdx.length;
+      
+      if (ratio < 0) ratio = 0;
+
+      const pointsPerQuestion = 10 / questions.length;
+      totalScore += ratio * pointsPerQuestion;
+      // ------------------------------------
 
       document.querySelectorAll("input").forEach(i => i.disabled = true);
       document.querySelectorAll(".answer-option").forEach(opt => opt.style.pointerEvents = "none");
@@ -831,14 +848,19 @@
         if (input.checked && !correctIdx.includes(i)) opt.classList.add("wrong");
       });
 
-      if (isCorrect) {
-        correctCount++;
+      // UI: Feedback Buton
+      if (ratio === 1) {
         streak++;
-        actionBtn.innerText = "CORECT! CONTINUĂ";
+        actionBtn.innerText = "PERFECT!";
         actionBtn.style.background = "var(--correct)";
+      } else if (ratio > 0) {
+        streak = 0;
+        const points = (ratio * pointsPerQuestion).toFixed(2);
+        actionBtn.innerText = "PARȚIAL: +" + points + "p";
+        actionBtn.style.background = "var(--warning)";
       } else {
         streak = 0;
-        actionBtn.innerText = "GREȘIT... CONTINUĂ";
+        actionBtn.innerText = "0 PUNCTE";
         actionBtn.style.background = "var(--wrong)";
       }
 
@@ -873,17 +895,29 @@
       }
     }
 
-    function showResults() {
-      const percent = Math.round((correctCount / questions.length) * 100);
+function showResults() {
       const container = document.getElementById("quiz-container");
-      if(percent >= 50) fireConfetti();
-      let msg = percent > 80 ? "Expert în Civil! 📜" : "Bun, dar repetă! 📚";
+      
+      // Nota finală rotunjită la 2 zecimale
+      const finalGrade = totalScore.toFixed(2);
+      
+      // Mesaje în funcție de notă
+      if(totalScore >= 5) fireConfetti();
+      let msg = "";
+      if (totalScore >= 9) msg = "Excelent! 🌟";
+      else if (totalScore >= 7) msg = "Foarte bine! 👏";
+      else if (totalScore >= 5) msg = "Ai trecut! 👍";
+      else msg = "Mai exersează! 📉";
 
       container.innerHTML = `
         <div class="result-view">
-          <div class="score-circle"><span style="z-index:2; color:white;">${percent}%</span></div>
+          <div class="score-circle">
+            <span style="z-index:2; color:white; font-size: 2.5rem;">${finalGrade}</span>
+          </div>
           <h1 style="margin:0;">${msg}</h1>
-          <p style="color:var(--text-muted); font-size:1.2rem; margin-top:10px;">Scor: ${correctCount} / ${questions.length}</p>
+          <p style="color:var(--text-muted); font-size:1.2rem; margin-top:10px;">
+            Nota finală: ${finalGrade}
+          </p>
           <div class="controls" style="margin-top:40px;">
              <button class="btn btn-secondary" onclick="location.href='index.html'">Meniu</button>
              <button class="btn btn-primary" onclick="location.reload()">Din Nou</button>
@@ -891,7 +925,6 @@
         </div>
       `;
     }
-
     function updateStreakUI() {
       streakEl.innerText = streak;
       if(streak > 2) streakEl.parentElement.style.background = "rgba(245, 158, 11, 0.4)";
