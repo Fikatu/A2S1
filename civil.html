@@ -812,61 +812,81 @@
       }
     }
 
-function checkAnswer() {
+ function checkAnswer() {
       const checked = Array.from(document.querySelectorAll('input[name="ans"]:checked'));
       if (checked.length === 0) return; 
 
       isAnswered = true;
       const userIdx = checked.map(c => parseInt(c.value));
       const correctIdx = questions[currentQ].correct;
+
+      // --- CALCUL MATEMATIC ---
       let correctSelected = 0;
       let wrongSelected = 0;
 
       userIdx.forEach(idx => {
-        if (correctIdx.includes(idx)) {
-          correctSelected++;
-        } else {
-          wrongSelected++;
-        }
+        if (correctIdx.includes(idx)) correctSelected++;
+        else wrongSelected++;
       });
 
+      // Calcul punctaj (Ratio: 1 = Perfect, <1 = Parțial/0)
       let ratio = (correctSelected - wrongSelected) / correctIdx.length;
-      
       if (ratio < 0) ratio = 0;
 
       const pointsPerQuestion = 10 / questions.length;
       totalScore += ratio * pointsPerQuestion;
-      // ------------------------------------
 
-      document.querySelectorAll("input").forEach(i => i.disabled = true);
-      document.querySelectorAll(".answer-option").forEach(opt => opt.style.pointerEvents = "none");
-
+      // --- UI: Colorăm răspunsurile (Să vedem ce s-a întâmplat) ---
       const options = document.querySelectorAll(".answer-option");
       options.forEach((opt, i) => {
         const input = opt.querySelector("input");
+        // Arătăm care erau corecte
         if (correctIdx.includes(i)) opt.classList.add("correct");
+        // Arătăm dacă ai bifat greșit
         if (input.checked && !correctIdx.includes(i)) opt.classList.add("wrong");
       });
 
-      // UI: Feedback Buton
+      // Dezactivăm interacțiunea
+      document.querySelectorAll("input").forEach(i => i.disabled = true);
+      document.querySelectorAll(".answer-option").forEach(opt => opt.style.pointerEvents = "none");
+      learnBtn.style.display = "none";
+
+      // --- LOGICA DE NAVIGARE ---
+      
+      // SCENARIUL 1: RĂSPUNS PERFECT (Ratio = 1)
       if (ratio === 1) {
         streak++;
-        actionBtn.innerText = "PERFECT!";
+        updateStreakUI();
+        
+        // Feedback vizual scurt pe buton
+        actionBtn.innerText = "CORECT! 👏";
         actionBtn.style.background = "var(--correct)";
-      } else if (ratio > 0) {
+        
+        // Trece AUTOMAT la următoarea după 1 secundă
+        setTimeout(() => {
+            nextQuestion();
+        }, 200);
+      } 
+      
+      // SCENARIUL 2: GREȘIT SAU PARȚIAL
+      else {
         streak = 0;
+        updateStreakUI();
+        
+        // Calculăm cât ai luat pe întrebare
         const points = (ratio * pointsPerQuestion).toFixed(2);
-        actionBtn.innerText = "PARȚIAL: +" + points + "p";
-        actionBtn.style.background = "var(--warning)";
-      } else {
-        streak = 0;
-        actionBtn.innerText = "0 PUNCTE";
-        actionBtn.style.background = "var(--wrong)";
-      }
+        
+        if (ratio > 0) {
+            actionBtn.innerText = `PARȚIAL: +${points}p (Continuă)`;
+            actionBtn.style.background = "var(--warning)";
+        } else {
+            actionBtn.innerText = "GREȘIT: 0p (Continuă)";
+            actionBtn.style.background = "var(--wrong)";
+        }
 
-      updateStreakUI();
-      actionBtn.onclick = nextQuestion;
-      learnBtn.style.display = "none";
+        // Aici NU trece automat. Trebuie să apeși butonul.
+        actionBtn.onclick = nextQuestion;
+      }
     }
 
     function triggerLearnMode() {
