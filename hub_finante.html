@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <title>Hub Finanțe</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --card-dark: #1e293b;
+      --accent: #10b981; /* Verde Emerald pentru Finanțe */
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 40px 20px;
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-image: 
+        radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      color: var(--text-main);
+      text-align: center;
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      margin-bottom: 50px;
+      font-size: 1.1rem;
+      text-align: center;
+    }
+
+    .grid-menu {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      max-width: 900px;
+      width: 100%;
+    }
+
+    .subject-card {
+      background: var(--card-dark);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 24px;
+      padding: 30px;
+      text-decoration: none;
+      color: var(--text-main);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 200px;
+      box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+    }
+
+    .subject-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent);
+      box-shadow: 0 20px 40px -10px rgba(16, 185, 129, 0.2);
+    }
+
+    .card-icon {
+      margin-bottom: 10px;
+      font-size: 2rem;
+    }
+
+    .card-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .card-desc {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .back-link {
+      margin-top: 40px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      transition: 0.2s;
+    }
+    .back-link:hover { color: white; }
+
+  </style>
+</head>
+<body>
+
+  <h1>Finanțe Publice</h1>
+  <p class="subtitle">Selectează setul de grile pe care vrei să îl exersezi</p>
+
+  <div class="grid-menu">
+    
+    <a href="finante.html" class="subject-card">
+      <div>
+        <div class="card-icon">1️⃣</div>
+        <div class="card-title">Primele Grile</div>
+        <div class="card-desc">Setul inițial de 57 de întrebări pentru examen.</div>
+      </div>
+    </a>
+
+    <a href="finante_nou.html" class="subject-card">
+      <div>
+        <div class="card-icon">2️⃣</div>
+        <div class="card-title">Grile Noi</div>
+        <div class="card-desc">Grilele noi.</div>
+      </div>
+    </a>
+
+    <a href="finante_manual.html" class="subject-card">
+      <div>
+        <div class="card-icon">📘</div>
+        <div class="card-title">Grile Manual</div>
+        <div class="card-desc">Grile extrase din manualul cursului.</div>
+      </div>
+    </a>
+
+  </div>
+
+  <a href="index.html" class="back-link">← Înapoi la Meniul Principal</a>
+
+</body>
+</html>
