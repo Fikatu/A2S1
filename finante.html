@@ -350,7 +350,7 @@
       {
         question: "Contractarea de către autoritățile publice de resurse financiare împrumutate pe termen scurt reprezintă o coordonată a:",
         answers: ["a) politicii financiar-monetare a autorităților publice", "b) politicii fiscale", "c) politicii finanțelor publice", "d) politicii bugetare"],
-        correct: [1] // Gestionarea trezoreriei/monetar
+        correct: [0, 3] // Gestionarea trezoreriei/monetar
       },
       {
         question: "În cheltuielile publice bugetare pentru învățământ NU se includ:",
@@ -540,7 +540,7 @@
       {
         question: "Contractarea de împrumuturi de către autoritățile publice reprezintă o coordonată a:",
         answers: ["a) politicii bugetare", "b) politicii finanțelor publice", "c) politicii financiar-monetare a autorităților publice", "d) politicii fiscale"],
-        correct: [2]
+        correct: [0, 2]
       },
       {
         question: "Reducerea efectului negativ al imobilizării fondurilor în cheltuieli de investiții se poate realiza prin:",
@@ -596,12 +596,12 @@
       loadQuestion();
     }
 
-    function loadQuestion() {
-      // Gestionare butoane navigare
+function loadQuestion() {
+      // 1. Gestionare butoane navigare
       prevBtn.disabled = (currentQ === 0);
       nextBtn.disabled = (currentQ === shuffledQuestions.length - 1);
 
-      // Resetare bară timp (vizual)
+      // 2. Resetare bară timp
       timerBar.style.transition = "none";
       timerBar.style.transform = "scaleX(1)";
       setTimeout(() => {
@@ -609,25 +609,28 @@
         timerBar.style.transform = "scaleX(0)";
       }, 100);
 
-      // Luăm întrebarea curentă din lista amestecată
+      // 3. Datele Întrebării
       const q = shuffledQuestions[currentQ];
+      
+      // Dacă vrei să cureți și numărul din fața întrebării (ex: "1. Întrebare" -> "Întrebare")
+      // folosește linia asta. Dacă nu, las-o pe cea simplă.
+      let cleanQuestionText = q.question.replace(/^\d+[\.\)]\s*/, ''); 
+      
       qNum.innerText = `Întrebarea ${currentQ + 1} / ${shuffledQuestions.length}`;
-      qText.innerText = q.question;
+      qText.innerText = cleanQuestionText; // Sau q.question dacă vrei să păstrezi numărul original
       answersList.innerHTML = "";
 
-      // Verificăm dacă avem deja o stare salvată (dacă am mai trecut pe aici)
+      // 4. Gestionare Stare (Memorie)
       let currentState = quizState[currentQ];
 
-      // Dacă e prima dată când intrăm pe întrebarea asta, îi amestecăm răspunsurile
       if (!currentState) {
-        // Creăm perechi {text, indexOriginal} ca să știm care e corect după amestecare
+        // Amestecare inițială
         let answerPairs = q.answers.map((text, idx) => ({ text: text, originalIdx: idx }));
         shuffleArray(answerPairs);
         
-        // Salvăm starea inițială (ne-răspunsă)
         currentState = {
             answered: false,
-            answerOrder: answerPairs, // Păstrăm ordinea asta pe vecie pentru întrebarea asta
+            answerOrder: answerPairs,
             selectedIdx: [],
             btnText: "VERIFICĂ",
             btnColor: "var(--accent)"
@@ -635,7 +638,7 @@
         quizState[currentQ] = currentState;
       }
 
-      // Configurăm butonul
+      // Configurare Buton Acțiune
       actionBtn.innerText = currentState.btnText;
       actionBtn.style.background = currentState.btnColor;
       
@@ -647,32 +650,41 @@
           learnBtn.style.display = "block";
       }
 
-      // Generăm HTML-ul pe baza ordinii salvate
+      // 5. Generare HTML Răspunsuri (AICI E MAGIA CU LITERELE)
+      const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g']; // Literele ordonate
+
       currentState.answerOrder.forEach((pair, domIndex) => {
         const div = document.createElement("label");
         div.className = "answer-option";
         
-        // Verificăm dacă a fost bifat anterior (folosind indexul original)
+        // --- AICI CURĂȚĂM TEXTUL VECHI ---
+        // Expresia regulată șterge orice începe cu o literă urmată de ) sau . și spațiu
+        // Ex: "a) Text" devine "Text" | "b. Text" devine "Text"
+        let cleanText = pair.text.replace(/^[a-zA-Z0-9]+[\.\)]\s*/, '');
+
+        // --- AICI PUNEM LITERA NOUĂ CORECTĂ ---
+        // Luăm litera corespunzătoare poziției actuale (0->a, 1->b...)
+        let newLabel = letters[domIndex] + ") "; 
+
+        // Verificăm dacă a fost bifat
         let isChecked = currentState.selectedIdx.includes(pair.originalIdx);
 
         div.innerHTML = `
           <input type="checkbox" name="ans" value="${pair.originalIdx}" ${isChecked ? "checked" : ""}>
           <div class="custom-check"></div>
-          <span class="ans-text">${pair.text}</span>
+          <span class="ans-text"><b>${newLabel}</b>${cleanText}</span>
         `;
 
-        // Dacă e deja răspunsă, blocăm și colorăm
+        // Logică de afișare (Colorare/Dezactivare) dacă e deja răspuns
         if (currentState.answered) {
             div.style.pointerEvents = "none";
             div.querySelector("input").disabled = true;
             
-            // Logica de colorare: comparăm indexul original cu lista de corecte
             const isCorrect = q.correct.includes(pair.originalIdx);
             
             if (isCorrect) div.classList.add("correct");
             if (isChecked && !isCorrect) div.classList.add("wrong");
         } else {
-            // Interacțiune normală
             div.querySelector("input").addEventListener("change", function() {
               if(this.checked) div.classList.add("selected");
               else div.classList.remove("selected");
@@ -787,10 +799,11 @@
       
       if(totalScore >= 5) fireConfetti();
       let msg = "";
-      if (totalScore >= 9) msg = "Excelent! 🌟";
-      else if (totalScore >= 7) msg = "Foarte bine! 👏";
-      else if (totalScore >= 5) msg = "Ai trecut! 👍";
-      else msg = "Mai exersează! 📉";
+      if (totalScore >= 10) msg = "I-ai dat fatala vere!!";
+      else if (totalScore >= 9) msg = "L-ai făcut vere pe zugri! 👏";
+      else if (totalScore >= 7) msg = "E de la tine 👍";
+      else if (totalScore >= 5) msg = "Ai avut noroc! 👍";
+      else msg = "SLAB RĂU! 📉";
 
       container.innerHTML = `
         <div class="result-view">
