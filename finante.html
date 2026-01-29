@@ -189,6 +189,20 @@
     .answer-option.wrong { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--wrong) !important; animation: shake 0.4s ease; }
     .answer-option.wrong .custom-check { background: var(--wrong) !important; border-color: var(--wrong) !important; }
     .answer-option.wrong .custom-check::after { content: '✖'; }
+    .nav-mini-container {
+      display: flex;
+      gap: 15px;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999; /* <--- Asta e cheia! Le forțează să fie deasupra tuturor */
+      pointer-events: auto; /* Se asigură că primesc click-uri */
+    }
+    .top-bar {
+      /* ... alte reguli ... */
+      position: relative;
+      z-index: 1000;
+    }
 
     /* --- CONTROLS (JOS) --- */
     .controls { display: flex; gap: 15px; margin-top: auto; }
@@ -678,9 +692,21 @@
       learnBtn.style.display = "none";
     }
 
+// --- NAVIGARE SIGURĂ ---
+    function prevQuestion() {
+      // Verificăm matematic să nu scădem sub 0
+      if (currentQ > 0) {
+        currentQ--;
+        loadQuestion();
+      } else {
+        console.log("Ești deja la prima întrebare.");
+      }
+    }
+
     function nextQuestion() {
-      currentQ++;
-      if (currentQ < questions.length) {
+      // Verificăm să nu depășim numărul total
+      if (currentQ < questions.length - 1) {
+        currentQ++;
         loadQuestion();
       } else {
         showResults();
