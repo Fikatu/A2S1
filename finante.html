@@ -166,6 +166,34 @@
     
     .confetti { position: fixed; width: 10px; height: 10px; background-color: #f00; animation: fall linear forwards; z-index: 100; }
     @keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
+    /* NAVIGARE NOUĂ */
+    .nav-row {
+      display: flex;
+      gap: 15px;
+      margin-top: 15px;
+      width: 100%;
+    }
+    .btn-nav {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: var(--text-main);
+      padding: 15px;
+      border-radius: 16px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: 0.2s;
+      flex: 0 0 60px; /* Lățime fixă pentru săgeți */
+      display: grid;
+      place-items: center;
+    }
+    .btn-nav:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: var(--text-main);
+    }
+    .btn-nav:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body>
@@ -187,9 +215,16 @@
       <div class="answers-list" id="answers-list"></div>
     </div>
 
-    <div class="controls">
-      <button class="btn btn-learn" id="learn-btn" onclick="triggerLearnMode()">👀 Învață</button>
-      <button class="btn btn-primary" id="action-btn" onclick="handleAction()">Verifică</button>
+<div class="controls-wrapper">
+      <div class="controls">
+        <button class="btn btn-learn" id="learn-btn" onclick="triggerLearnMode()">👀 Învață</button>
+        <button class="btn btn-primary" id="action-btn" onclick="handleAction()">VERIFICĂ</button>
+      </div>
+
+      <div class="nav-row">
+        <button class="btn-nav" id="prev-btn" onclick="prevQuestion()">⬅️</button>
+        <div style="flex:1;"></div> <button class="btn-nav" id="next-btn" onclick="nextQuestion()">➡️</button>
+      </div>
     </div>
   </div>
 
@@ -483,12 +518,15 @@
       }
     ];
 
+// --- VARIABILE DE STARE ---
     let currentQ = 0;
-    let correctCount = 0;
     let totalScore = 0;
     let streak = 0;
-    let isAnswered = false;
+    
+    // Aici memorăm starea fiecărei întrebări (dacă a fost răspunsă și cum)
+    let quizState = []; 
 
+    // Referințe UI
     const qText = document.getElementById("q-text");
     const qNum = document.getElementById("q-number");
     const answersList = document.getElementById("answers-list");
@@ -496,24 +534,25 @@
     const learnBtn = document.getElementById("learn-btn");
     const streakEl = document.getElementById("streak-count");
     const timerBar = document.getElementById("timer-bar");
+    const prevBtn = document.getElementById("prev-btn");
+    const nextBtn = document.getElementById("next-btn");
 
     function initQuiz() {
       currentQ = 0;
-      correctCount = 0;
       totalScore = 0;
       streak = 0;
+      // Inițializăm memoria goală pentru toate întrebările
+      quizState = new Array(questions.length).fill(null);
       updateStreakUI();
       loadQuestion();
     }
 
     function loadQuestion() {
-      isAnswered = false;
-      actionBtn.innerText = "VERIFICĂ";
-      actionBtn.onclick = handleAction;
-      actionBtn.style.display = "block";
-      actionBtn.style.background = "var(--accent)";
-      learnBtn.style.display = "block";
-      
+      // 1. Gestionăm butoanele de navigare
+      prevBtn.disabled = (currentQ === 0);
+      nextBtn.disabled = (currentQ === questions.length - 1); // Se activează doar dacă vrei să sari peste ultima
+
+      // 2. Bară de progres (Timer vizual)
       timerBar.style.transition = "none";
       timerBar.style.transform = "scaleX(1)";
       setTimeout(() => {
@@ -521,45 +560,82 @@
         timerBar.style.transform = "scaleX(0)";
       }, 100);
 
+      // 3. Afișăm textul întrebării
       const q = questions[currentQ];
       qNum.innerText = `Întrebarea ${currentQ + 1} / ${questions.length}`;
       qText.innerText = q.question;
-      
       answersList.innerHTML = "";
-      
+
+      // 4. Verificăm dacă am răspuns deja la această întrebare în trecut
+      const state = quizState[currentQ];
+      const isAlreadyAnswered = (state !== null);
+
+      // Configurăm butonul principal
+      if (isAlreadyAnswered) {
+        actionBtn.innerText = state.btnText;
+        actionBtn.style.background = state.btnColor;
+        // Dacă e deja răspunsă, butonul doar te duce la următoarea
+        actionBtn.onclick = () => nextQuestion();
+        learnBtn.style.display = "none";
+      } else {
+        actionBtn.innerText = "VERIFICĂ";
+        actionBtn.style.background = "var(--accent)";
+        actionBtn.onclick = handleAction;
+        learnBtn.style.display = "block";
+      }
+
+      // 5. Generăm variantele de răspuns
       q.answers.forEach((ans, i) => {
         const div = document.createElement("label");
         div.className = "answer-option";
+        
+        // Refacem starea (bifat/nebifat și culori)
+        let isChecked = false;
+        if (isAlreadyAnswered && state.selectedIdx.includes(i)) {
+            isChecked = true;
+        }
+
         div.innerHTML = `
-          <input type="checkbox" name="ans" value="${i}">
+          <input type="checkbox" name="ans" value="${i}" ${isChecked ? "checked" : ""}>
           <div class="custom-check"></div>
           <span class="ans-text">${ans}</span>
         `;
-        div.querySelector("input").addEventListener("change", function() {
-          if(this.checked) div.classList.add("selected");
-          else div.classList.remove("selected");
-        });
+
+        // Dacă e deja răspunsă, aplicăm culorile și dezactivăm
+        if (isAlreadyAnswered) {
+            div.style.pointerEvents = "none";
+            div.querySelector("input").disabled = true;
+            
+            // Logica de colorare istoric
+            if (q.correct.includes(i)) div.classList.add("correct");
+            if (isChecked && !q.correct.includes(i)) div.classList.add("wrong");
+        } else {
+            // Eveniment normal de click
+            div.querySelector("input").addEventListener("change", function() {
+              if(this.checked) div.classList.add("selected");
+              else div.classList.remove("selected");
+            });
+        }
+        
+        // Adăugăm clasa 'selected' vizual dacă a fost bifată anterior
+        if (isChecked && !isAlreadyAnswered) div.classList.add("selected");
+
         answersList.appendChild(div);
       });
     }
 
     function handleAction() {
-      if (!isAnswered) {
-        checkAnswer();
-      } else {
-        nextQuestion();
-      }
+      checkAnswer();
     }
 
     function checkAnswer() {
       const checked = Array.from(document.querySelectorAll('input[name="ans"]:checked'));
       if (checked.length === 0) return; 
 
-      isAnswered = true;
       const userIdx = checked.map(c => parseInt(c.value));
       const correctIdx = questions[currentQ].correct;
 
-      // Calcul Punctaj (Corecte - Greșite) / Total Corecte
+      // --- CALCUL MATEMATIC ---
       let correctSelected = 0;
       let wrongSelected = 0;
 
@@ -572,65 +648,82 @@
       if (ratio < 0) ratio = 0;
 
       const pointsPerQuestion = 10 / questions.length;
-      totalScore += ratio * pointsPerQuestion;
+      const pointsEarned = ratio * pointsPerQuestion;
+      
+      // Adăugăm la scorul total
+      totalScore += pointsEarned;
 
-      // UI: Colorare
-      const options = document.querySelectorAll(".answer-option");
-      options.forEach((opt, i) => {
-        const input = opt.querySelector("input");
-        if (correctIdx.includes(i)) opt.classList.add("correct");
-        if (input.checked && !correctIdx.includes(i)) opt.classList.add("wrong");
-      });
+      // --- UI Feedback ---
+      let btnText = "";
+      let btnColor = "";
 
-      document.querySelectorAll("input").forEach(i => i.disabled = true);
-      document.querySelectorAll(".answer-option").forEach(opt => opt.style.pointerEvents = "none");
-      learnBtn.style.display = "none";
-
-      // Navigare sau Continuare
       if (ratio === 1) {
         streak++;
-        updateStreakUI();
-        actionBtn.innerText = "CORECT! 👏";
-        actionBtn.style.background = "var(--correct)";
-        
-        setTimeout(() => { nextQuestion(); }, 1000);
+        btnText = "CORECT! 👏";
+        btnColor = "var(--correct)";
+        // Navigare automată doar dacă e corect
+        setTimeout(() => { 
+            // Verificăm dacă utilizatorul nu a schimbat întrebarea între timp
+            if(currentQ < questions.length - 1) nextQuestion(); 
+        }, 1200);
       } else {
         streak = 0;
-        updateStreakUI();
-        const points = (ratio * pointsPerQuestion).toFixed(2);
-        
+        const pts = pointsEarned.toFixed(2);
         if (ratio > 0) {
-            actionBtn.innerText = `PARȚIAL: +${points}p (Continuă)`;
-            actionBtn.style.background = "var(--warning)";
+            btnText = `PARȚIAL: +${pts}p`;
+            btnColor = "var(--warning)";
         } else {
-            actionBtn.innerText = "GREȘIT: 0p (Continuă)";
-            actionBtn.style.background = "var(--wrong)";
+            btnText = "GREȘIT: 0p";
+            btnColor = "var(--wrong)";
         }
-        actionBtn.onclick = nextQuestion;
       }
+
+      // --- SALVĂM STAREA ÎN MEMORIE ---
+      quizState[currentQ] = {
+          answered: true,
+          selectedIdx: userIdx,
+          score: pointsEarned,
+          btnText: btnText,
+          btnColor: btnColor
+      };
+
+      updateStreakUI();
+      
+      // Reîncărcăm întrebarea curentă pentru a aplica starea de "Răspuns" (înghețare)
+      loadQuestion();
     }
 
     function triggerLearnMode() {
-      isAnswered = true;
+      // Modul învață pur și simplu marchează întrebarea ca rezolvată cu 0 puncte, dar arată răspunsurile
       const correctIdx = questions[currentQ].correct;
-      document.querySelectorAll(".answer-option").forEach((opt, i) => {
-        if (correctIdx.includes(i)) opt.classList.add("correct");
-        opt.style.pointerEvents = "none";
-        opt.querySelector("input").disabled = true;
-      });
+      
+      quizState[currentQ] = {
+          answered: true,
+          selectedIdx: [], // Nu am selectat nimic
+          score: 0,
+          btnText: "MOD ÎNVĂȚARE",
+          btnColor: "var(--accent)"
+      };
+      
       streak = 0;
       updateStreakUI();
-      actionBtn.innerText = "URMĂTOAREA";
-      actionBtn.style.background = "var(--accent)";
-      actionBtn.onclick = nextQuestion;
-      learnBtn.style.display = "none";
+      loadQuestion();
+    }
+
+    // --- NAVIGARE ---
+    function prevQuestion() {
+      if (currentQ > 0) {
+        currentQ--;
+        loadQuestion();
+      }
     }
 
     function nextQuestion() {
-      currentQ++;
-      if (currentQ < questions.length) {
+      if (currentQ < questions.length - 1) {
+        currentQ++;
         loadQuestion();
       } else {
+        // Dacă suntem la ultima întrebare și dăm Next, afișăm rezultatele
         showResults();
       }
     }
@@ -641,10 +734,11 @@
       
       if(totalScore >= 5) fireConfetti();
       let msg = "";
-      if (totalScore >= 9) msg = "L-ai spart vere pe zugri";
+      if (totalScore >= 10) msg = "I-ai dat fatala vere! 🌟";
+      else if (totalScore >= 9) msg = "L-ai rupt vere pe zugri!";
       else if (totalScore >= 7) msg = "E de la tine!";
       else if (totalScore >= 5) msg = "E de la tine!";
-      else msg = "Slab, e de la voi!";
+      else msg = "Slab rău, e de la voi!";
 
       container.innerHTML = `
         <div class="result-view">
@@ -665,8 +759,8 @@
 
     function updateStreakUI() {
       streakEl.innerText = streak;
-      if(streak > 2) streakEl.parentElement.style.background = "rgba(245, 158, 11, 0.4)";
-      else streakEl.parentElement.style.background = "rgba(245, 158, 11, 0.15)";
+      if(streak > 2) streakEl.parentElement.style.background = "rgba(255, 255, 255, 0.2)";
+      else streakEl.parentElement.style.background = "rgba(255, 255, 255, 0.05)";
     }
 
     function fireConfetti() {
@@ -682,7 +776,9 @@
       }
     }
 
+    // Pornire
     initQuiz();
   </script>
 </body>
 </html>
+
