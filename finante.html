@@ -485,6 +485,7 @@
 
     let currentQ = 0;
     let correctCount = 0;
+    let totalScore = 0;
     let streak = 0;
     let isAnswered = false;
 
@@ -499,6 +500,7 @@
     function initQuiz() {
       currentQ = 0;
       correctCount = 0;
+      totalScore = 0;
       streak = 0;
       updateStreakUI();
       loadQuestion();
@@ -509,6 +511,7 @@
       actionBtn.innerText = "VERIFICĂ";
       actionBtn.onclick = handleAction;
       actionBtn.style.display = "block";
+      actionBtn.style.background = "var(--accent)";
       learnBtn.style.display = "block";
       
       timerBar.style.transition = "none";
@@ -553,14 +556,25 @@
       if (checked.length === 0) return; 
 
       isAnswered = true;
-      const userIdx = checked.map(c => parseInt(c.value)).sort();
-      const correctIdx = questions[currentQ].correct.slice().sort();
+      const userIdx = checked.map(c => parseInt(c.value));
+      const correctIdx = questions[currentQ].correct;
 
-      const isCorrect = JSON.stringify(userIdx) === JSON.stringify(correctIdx);
+      // Calcul Punctaj (Corecte - Greșite) / Total Corecte
+      let correctSelected = 0;
+      let wrongSelected = 0;
 
-      document.querySelectorAll("input").forEach(i => i.disabled = true);
-      document.querySelectorAll(".answer-option").forEach(opt => opt.style.pointerEvents = "none");
+      userIdx.forEach(idx => {
+        if (correctIdx.includes(idx)) correctSelected++;
+        else wrongSelected++;
+      });
 
+      let ratio = (correctSelected - wrongSelected) / correctIdx.length;
+      if (ratio < 0) ratio = 0;
+
+      const pointsPerQuestion = 10 / questions.length;
+      totalScore += ratio * pointsPerQuestion;
+
+      // UI: Colorare
       const options = document.querySelectorAll(".answer-option");
       options.forEach((opt, i) => {
         const input = opt.querySelector("input");
@@ -568,20 +582,32 @@
         if (input.checked && !correctIdx.includes(i)) opt.classList.add("wrong");
       });
 
-      if (isCorrect) {
-        correctCount++;
+      document.querySelectorAll("input").forEach(i => i.disabled = true);
+      document.querySelectorAll(".answer-option").forEach(opt => opt.style.pointerEvents = "none");
+      learnBtn.style.display = "none";
+
+      // Navigare sau Continuare
+      if (ratio === 1) {
         streak++;
-        actionBtn.innerText = "CORECT! CONTINUĂ";
+        updateStreakUI();
+        actionBtn.innerText = "CORECT! 👏";
         actionBtn.style.background = "var(--correct)";
+        
+        setTimeout(() => { nextQuestion(); }, 1000);
       } else {
         streak = 0;
-        actionBtn.innerText = "GREȘIT... CONTINUĂ";
-        actionBtn.style.background = "var(--wrong)";
+        updateStreakUI();
+        const points = (ratio * pointsPerQuestion).toFixed(2);
+        
+        if (ratio > 0) {
+            actionBtn.innerText = `PARȚIAL: +${points}p (Continuă)`;
+            actionBtn.style.background = "var(--warning)";
+        } else {
+            actionBtn.innerText = "GREȘIT: 0p (Continuă)";
+            actionBtn.style.background = "var(--wrong)";
+        }
+        actionBtn.onclick = nextQuestion;
       }
-
-      updateStreakUI();
-      actionBtn.onclick = nextQuestion;
-      learnBtn.style.display = "none";
     }
 
     function triggerLearnMode() {
@@ -602,7 +628,6 @@
 
     function nextQuestion() {
       currentQ++;
-      actionBtn.style.background = "var(--accent)";
       if (currentQ < questions.length) {
         loadQuestion();
       } else {
@@ -611,16 +636,25 @@
     }
 
     function showResults() {
-      const percent = Math.round((correctCount / questions.length) * 100);
       const container = document.getElementById("quiz-container");
-      if(percent >= 50) fireConfetti();
-      let msg = percent > 80 ? "Expert Financiar! 💸" : "Bun, dar mai repetă! 📉";
+      const finalGrade = totalScore.toFixed(2);
+      
+      if(totalScore >= 5) fireConfetti();
+      let msg = "";
+      if (totalScore >= 9) msg = "L-ai spart vere pe zugri";
+      else if (totalScore >= 7) msg = "E de la tine!";
+      else if (totalScore >= 5) msg = "E de la tine!";
+      else msg = "Slab, e de la voi!";
 
       container.innerHTML = `
         <div class="result-view">
-          <div class="score-circle"><span style="z-index:2; color:white;">${percent}%</span></div>
+          <div class="score-circle">
+            <span style="z-index:2; color:white; font-size: 2.5rem;">${finalGrade}</span>
+          </div>
           <h1 style="margin:0;">${msg}</h1>
-          <p style="color:var(--text-muted); font-size:1.2rem; margin-top:10px;">Scor: ${correctCount} / ${questions.length}</p>
+          <p style="color:var(--text-muted); font-size:1.2rem; margin-top:10px;">
+            Nota finală: ${finalGrade} din 10
+          </p>
           <div class="controls" style="margin-top:40px;">
              <button class="btn btn-secondary" onclick="location.href='index.html'">Meniu</button>
              <button class="btn btn-primary" onclick="location.reload()">Din Nou</button>
@@ -636,7 +670,7 @@
     }
 
     function fireConfetti() {
-      const colors = ['#059669', '#10b981', '#f59e0b', '#ec4899'];
+      const colors = ['#10b981', '#34d399', '#f59e0b', '#ffffff'];
       for (let i = 0; i < 50; i++) {
         const conf = document.createElement('div');
         conf.className = 'confetti';
