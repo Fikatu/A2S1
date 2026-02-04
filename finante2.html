@@ -263,140 +263,155 @@
     /* GRILE FINANȚE PUBLICE - Toate cele 57 de întrebări */
     const questions = [
       {
-        question: "Cuantumul pensiei (publice) anticipate depinde de:",
-        answers: ["a) gradul de invaliditate", "b) cauzele pierderii capacității de muncă", "c) durata stagiului efectiv de cotizare", "d) vârsta solicitantului"],
-        correct: [2, 3] 
+        question: "Cheltuielile publice definitive:",
+        answers: ["a) includ numai cheltuielile curente, nu și pe cele de transfer", "b) sunt cuprinse ca posturi distincte în bugetele publice", "c) includ numai cheltuielile reale", "d) includ numai cheltuielile reale (negative), nu și pe cele economice (pozitive)"],
+        correct: [1] 
       },
       {
-        question: "Impactul tipului de stat socialist asupra finanțelor publice se poate traduce prin:",
-        answers: ["a) alocarea și utilizarea resurselor financiare concentrate la dispoziția statului prin decizii cu caracter public", "b) distribuirea planificată a fondurilor (resurselor) financiare, corespunzător obiectivelor prevăzute prin planurile centralizate", "c) concentrarea celei mai mari părți a resurselor financiare la dispoziția statului sau a întreprinderilor și instituțiilor sale", "d) o sferă de cuprindere foarte largă a finanțelor publice"],
-        correct: [0, 1, 2, 3] // Toate sunt caracteristici ale modelului centralizat
+        question: "În calculul elasticității cheltuielilor publice în raport cu produsul intern brut nu intervin:",
+        answers: ["a) volumul cheltuielilor publice exprimat în prețuri curente", "b) deflatorul produsului intern brut", "c) produsul intern brut exprimat la paritatea puterii de cumpărare", "d) volumul cheltuielilor publice exprimat în prețuri constante"],
+        correct: [1, 2, 3] // Se folosesc mărimile nominale (curente) de obicei
       },
       {
-        question: "Restituirea impozitelor sau taxelor aferente producției exportate reprezintă:",
-        answers: ["a) o variantă de subvenționare indirectă a economiei", "b) o decizie de politică fiscală", "c) o decizie de politică bugetară", "d) o variantă de subvenționare directă a economiei"],
-        correct: [1, 2, 3] // Subvenție indirectă, instrument fiscal
+        question: "Mărimea costurilor luate în calcul, în aplicarea 'analizei cost-avantaje', cuprinde:",
+        answers: ["a) cheltuielile cu plata salariilor personalului angajat", "b) cheltuielile cu achiziționarea-montarea utilajelor", "c) pierderile de venit antrenate de realizarea obiectivului (cost de oportunitate)", "d) cheltuielile cu amortizarea capitalului fix", "e) plățile privind impozitul pe profit"],
+        correct: [0, 1, 2, 3] // Amortizarea și impozitul nu se includ în cost-benefit social
       },
       {
-        question: "Beneficiari ai cheltuielilor economice constând în acordarea de subvenții pot fi:",
-        answers: ["a) întreprinderile cu capital de stat", "b) întreprinderile private mari", "c) instituțiile social-culturale", "d) întreprinderile private mici și mijlocii"],
-        correct: [0, 1, 3] // Statul și IMM-urile sunt țintele predilecte
-      },
-      {
-        question: "În categoria cheltuielilor militare indirecte se includ:",
-        answers: ["a) cheltuielile cu pensiile plătite invalizilor de război", "b) cheltuielile cu salariile personalului militar", "c) plățile de dobânzi la împrumuturile publice contractate pentru înzestrarea armatei", "d) cheltuielile pentru dotarea cu armament și tehnică militară"],
-        correct: [0, 2] // b și d sunt directe
-      },
-      {
-        question: "Care din următoarele afirmații sunt adevărate:",
-        answers: ["a) funcția finanțelor de control asupra activităților economico-sociale are o sferă de manifestare mai extinsă decât funcția finanțelor de repartiție a PIB", "b) funcția finanțelor de repartiție a PIB oferă câmp de manifestare funcției de control", "c) îndeplinirea funcției de control generează uneori forme de manifestare a funcției de repartiție", "d) modalitățile tehnice de constituire și distribuire a fondurilor conferă funcției de repartiție un caracter obiectiv"],
-        correct: [0, 1, 2]
-      },
-      {
-        question: "Printre variantele de subvenționare indirectă a economiei (agenților economici) se pot menționa:",
-        answers: ["a) restituirea unor impozite și taxe aferente producției exportate", "b) acordarea de prime de export", "c) reducerea tarifelor la transporturile efectuate cu mijloacele statului", "d) acordarea de avantaje valutare"],
-        correct: [2, 3] // Primele de export sunt directe
-      },
-      {
-        question: "Finanțarea integrală de la buget a cercetării științifice este recomandată în cazul:",
-        answers: ["a) acțiunilor de cercetare științifică orientate spre aplicarea în practică a cunoștințelor existente", "b) acțiunilor de cercetare științifică orientate spre asimilarea și introducerea de tehnologii noi", "c) acțiunilor de cercetare științifică orientate spre producerea la scară industrială a unor produse noi", "d) acțiunilor de cercetare științifică orientate spre dezvoltarea cunoașterii în diferite domenii"],
-        correct: [3] // Cercetare fundamentală
-      },
-      {
-        question: "Mărimea subvenției stabilite în sumă fixă (pe unitatea de măsură a produsului), ce revine unei întreprinderi, depinde de:",
-        answers: ["a) costul produsului", "b) cantitatea de produse vândute", "c) prețul garantat de stat", "d) prețul de vânzare (efectiv)", "e) profitul întreprinzătorului"],
-        correct: [1] // Suma totală depinde de cantitate (Subvenția unitară depinde de a, c, d)
-      },
-      {
-        question: "Volumul cheltuielilor publice exprimat în prețuri constante intervine în calculul:",
-        answers: ["a) indicelui modificării (creșterii) relative nominale a cheltuielilor publice", "b) coeficientului de elasticitate a cheltuielilor publice în raport cu PIB", "c) indicelui modificării (creșterii) relative reale a cheltuielilor publice", "d) modificării (creșterii) reale a cheltuielilor publice"],
-        correct: [2, 3]
-      },
-      {
-        question: "În sens economic restrâns, conceptul de cheltuială publică se referă la:",
-        answers: ["a) procese economice de consum public de resurse", "b) cheltuielile bugetare (ale statului)", "c) sume alocate din bugetul public", "d) ansamblul activităților cu caracter public"],
-        correct: [1, 2]
-      },
-      {
-        question: "Ca efecte sociale ale finanțării cheltuielilor publice pentru ocrotirea sănătății sunt considerate:",
-        answers: ["a) reducerea morbidității", "b) creșterea speranței medii de viață la naștere", "c) refacerea și păstrarea sănătății persoanelor care beneficiază de asistență medicală", "d) eradicarea unor boli profesionale"],
-        correct: [0, 1]
-      },
-      {
-        question: "Cheltuielile publice efectuate pentru modernizarea și dezvoltarea întreprinderilor cu capital de stat se încadrează în categoria:",
-        answers: ["a) cheltuielilor publice temporare (conform clasificării financiare)", "b) cheltuielilor publice virtuale (conform clasificării financiare)", "c) cheltuielilor publice de transfer", "d) cheltuielilor publice pentru acțiuni economice"],
-        correct: [3] // Temporare (investiții recuperabile) și economice
-      },
-      {
-        question: "În sfera cheltuielilor publice cu acordarea de indemnizații sau ajutoare de asigurări sociale se încadrează:",
-        answers: ["a) plățile cu ajutorul de șomaj", "b) plățile de indemnizații în caz de maternitate", "c) plățile de alocații de sprijin pentru persoanele ce nu au un loc de muncă și nu pot beneficia de ajutorul de șomaj", "d) compensările costurilor de odihnă și tratament balnear, medicamentelor și serviciilor medicale"],
-        correct: [0, 1, 3] // c este asistență socială
-      },
-      {
-        question: "Forma bănească de exprimare a proceselor și relațiilor economice:",
-        answers: ["a) reprezintă trăsătura definitorie a finanțelor", "b) caracterizează finanțele numai în accepțiune restrânsă", "c) caracterizează finanțele în orice accepțiune dată conceptului de finanțe și a sferei de cuprindere a acestora", "d) este considerată definitorie pentru conceptul de finanțe numai în condițiile utilizării banului cu valoare intrinsecă"],
+        question: "Politica fiscală are ca obiective:",
+        answers: ["a) stabilirea destinațiilor și alocarea resurselor financiare publice", "b) finanțarea deficitului bugetar", "c) stabilirea și perceperea impozitelor și taxelor", "d) asigurarea echilibrului monetar"],
         correct: [0, 2]
       },
       {
-        question: "Primele forme concrete de utilizare a resurselor financiare ale statului sunt considerate:",
-        answers: ["a) împrumuturile contractate în bani", "b) impozitele în bani", "c) soldele în bani acordate militarilor", "d) dările în natură și prestațiile în muncă pentru stat"],
-        correct: [2] // Utilizare = Cheltuieli (imprumuturile și impozitele sunt resurse/venituri, dările în natură nu sunt financiare)
-      },
-      {
-        question: "Strategia financiară se definește prin:",
-        answers: ["a) decizii financiare pe termen scurt", "b) decizii financiare referitoare la obiective majore", "c) decizii financiare referitoare la operațiunile bănești curente", "d) decizii financiare pe termen mediu sau lung"],
-        correct: [1, 3]
-      },
-      {
-        question: "Contractarea de către autoritățile publice de resurse financiare împrumutate pe termen scurt reprezintă o coordonată a:",
-        answers: ["a) politicii financiar-monetare a autorităților publice", "b) politicii fiscale", "c) politicii finanțelor publice", "d) politicii bugetare"],
-        correct: [0, 3] // Gestionarea trezoreriei/monetar
-      },
-      {
-        question: "În cheltuielile publice bugetare pentru învățământ NU se includ:",
-        answers: ["a) subvențiile acordate cantinelor și căminelor", "b) impozitul pe salariile aferente personalului didactic și auxiliar", "c) salariile brute ale personalului didactic și auxiliar", "d) cheltuielile suportate din taxele școlare", "e) cheltuielile de întreținere și reparații curente a mijloacelor fixe"],
-        correct: [3] // Taxele școlare sunt venituri proprii extrabugetare
-      },
-      {
-        question: "În sistemul englez (Beveridge) de ocrotire a sănătății:",
-        answers: ["a) accesul la serviciile medicale nu este restricționat de contributivitate", "b) cheltuielile publice destinate ocrotirii sănătății se finanțează prin Case de Asigurări", "c) asigurații plătesc impozite proporționale cu riscul de îmbolnăvire", "d) salariații și angajatorii suportă contribuții obligatorii pentru finanțarea sistemului de sănătate"],
-        correct: [0] // Finanțare de la buget (taxe generale), nu contribuții directe
-      },
-      {
-        question: "Care din modificările variabilelor următoare determină reducerea efectului negativ al imobilizării fondurilor într-un obiectiv (public) de investiții:",
-        answers: ["a) creșterea sumei ce se investește anual", "b) reducerea duratei de realizare a obiectivului", "c) creșterea ratei de actualizare", "d) reducerea ratei de actualizare"],
-        correct: [1] // Termini mai repede = imobilizezi mai puțin timp
-      },
-      {
-        question: "O dinamică a cheltuielilor publice superioară celei a produsului intern brut se regăsește în:",
-        answers: ["a) creșterea cheltuielilor publice medii pe locuitor", "b) un indice subunitar de creștere relativă nominală a cheltuielilor publice", "c) creșterea datoriei publice", "d) creșterea proporțiilor redistribuirii produsului intern brut prin cheltuieli publice", "e) un indice supraunitar de creștere relativă nominală a cheltuielilor publice"],
-        correct: [3]
-      },
-      {
-        question: "Cheltuielile finanțate din fondurile securității sociale sunt:",
-        answers: ["a) cheltuieli bugetare", "b) cheltuieli din bugetul asigurărilor sociale de stat", "c) cheltuieli din bugetele locale", "d) cheltuieli publice numai în sens restrâns"],
+        question: "Cheltuielile publice bugetare pentru dezvoltarea sectorului economic de stat vizează:",
+        answers: ["a) plăți de dobânzi și anuități aferente datoriilor contractate", "b) crearea de întreprinderi de stat", "c) creșterea consumului de bunuri și servicii publice", "d) funcției de reglare (stabilizare)", "e) funcției de control"],
         correct: [0, 1]
       },
       {
-        question: "Mijlocirea de către finanțele publice a unor procese de redistribuire a resurselor între persoanele fizice și juridice, cu implicarea autorităților publice, potrivit unor criterii de echitate socială, exprimă (Musgrave):",
-        answers: ["a) alocare", "b) stabilizare", "c) control", "d) distribuire"],
-        correct: [3]
+        question: "Criteriul momentului în care se efectuează cheltuielile publice și modul în care acestea afectează resursele financiare publice este specific:",
+        answers: ["a) clasificației funcționale", "b) clasificației economice", "c) clasificației financiare", "d) clasificației administrativ-departamentale"],
+        correct: [2] // Definitivă, temporară, virtuală
       },
       {
-        question: "Densitatea administrației:",
-        answers: ["a) exprimă numărul persoanelor ocupate în aparatul de stat, la 1000 de locuitori", "b) arată mărimea cheltuielilor publice aferente finanțării administrației de stat, ce revin la 1000 u.m. PIB", "c) se determină ca raport între numărul de funcționari publici și suprafața totală a clădirilor"],
-        correct: [0]
+        question: "Care dintre următoarele afirmații privitoare la tipurile de stat și impactul lor asupra finanțelor publice sunt adevărate:",
+        answers: ["a) intervenția statului protector în activitățile economice ar avea efecte dereglatoare", "b) implicarea directă în desfășurarea activităților economice este o caracteristică a statului protector", "c) statul de tip intervenționist nu poate fi caracterizat ca un stat redistribuitor al resurselor", "d) manifestarea tipului de stat intervenționist implică o sferă mai restrânsă de manifestare a finanțelor publice în raport cu tipul de stat protector"],
+        correct: [0] // Statul protector (jandarm) crede că intervenția e dereglatoare
       },
       {
-        question: "Care din următoarele afirmații sunt adevărate:",
-        answers: ["a) în concepția clasică, cheltuielile publice nu sunt considerate procese de repartiție", "b) în sens larg, conceptul de cheltuială publică include și cheltuielile bugetare", "c) pentru a determina indicele creșterii relative nominale nu este necesară cunoașterea mărimii în prețuri constante", "d) cheltuielile materiale ale întreprinderilor cu capital de stat nu sunt considerate cheltuieli publice decât în sensul restrâns"],
+        question: "În conceperea și promovarea unui sistem fiscal modern trebuie evitate:",
+        answers: ["a) repartizarea inegală a sarcinii fiscale între contribuabili", "b) apelul la emisiunea de monedă pentru finanțarea de cheltuieli publice peste veniturile obișnuite", "c) apelul la împrumuturi de stat pentru finanțarea deficitului bugetar", "d) progresivitatea accentuată a cotelor de impozit"],
+        correct: [0, 3]
+      },
+      {
+        question: "Cheltuielile publice bugetare pentru cultură, artă și sport:",
+        answers: ["a) reprezintă investiții în resursele umane", "b) au caracter productiv direct și integral", "c) pot fi recuperate parțial pe seama rezultatelor acestor activități", "d) pot avea ca finalitate bunuri materiale sau diverse servicii"],
+        correct: [0, 2, 3]
+      },
+      {
+        question: "Cheltuielile publice bugetare cu plata ajutorului de șomaj se încadrează în categoria:",
+        answers: ["a) cheltuielilor de transfer conform clasificației economice", "b) cheltuielilor curente conform clasificației economice", "c) cheltuielilor definitive conform clasificației financiare", "d) cheltuielilor virtuale conform clasificației financiare", "e) cheltuielilor temporare conform clasificației financiare"],
         correct: [0, 1, 2]
       },
       {
-        question: "Intervenția reglatoare prin instrumente financiare a autorităților publice în faza de supraîncălzire a economiei se poate realiza prin:",
-        answers: ["a) diminuarea cheltuielilor publice de consum și/sau de investiții", "b) acceptarea deficitului bugetar și finanțarea acestuia din resurse extraordinare", "c) întocmirea de bugete extraordinare", "d) majorarea impozitelor (directe și/sau indirecte)"],
-        correct: [0, 3] // Politică restrictivă
+        question: "În concepția lui Keynes la o creștere a veniturilor indivizii vor reacționa prin:",
+        answers: ["a) creșterea înclinației marginale spre consum", "b) creșterea înclinației marginale spre economisire", "c) reducerea consumului", "d) economisirea unei părți din sporul de venit"],
+        correct: [1, 3]
       },
+      {
+        question: "Care dintre următoarele afirmații cu privire la cheltuielile pentru servicii publice generale sunt adevărate:",
+        answers: ["a) în structura acestora se regăsesc cheltuielile publice ale organelor puterii judecătorești", "b) au un caracter divizibil", "c) se particularizează prin faptul că în cadrul lor cheltuielile curente dețin o pondere neglijabilă", "d) sunt acoperite în principal pe seama fondurilor cu destinație specială"],
+        correct: [0] // Sunt indivizibile, cheltuielile curente (salarii) sunt mari
+      },
+      {
+        question: "Ca efecte economice ale finanțării cheltuielilor publice pentru ocrotirea sănătății sunt considerate:",
+        answers: ["a) creșterea perioadei active a vieții", "b) eradicarea unor boli profesionale", "c) creșterea speranței medii de viață la naștere", "d) refacerea și păstrarea sănătății persoanelor"],
+        correct: [0, 1] // Celelalte sunt sociale
+      },
+      {
+        question: "Care dintre următoarele afirmații cu privire la politica fiscală sunt adevărate:",
+        answers: ["a) politica fiscală trebuie concepută luând în considerare numai destinațiile date resurselor fiscale", "b) în accepțiune restrictivă, politica fiscală vizează numai procurarea resurselor fiscale", "c) politica fiscală este condiționată de mediul economic (starea economiei, nivelul veniturilor)", "d) politica fiscală poate fi elaborată numai de către stat sau autorități publice locale"],
+        correct: [1, 2, 3]
+      },
+      {
+        question: "În calculul investiției specifice, ca indicator de apreciere a eficienței cheltuielilor publice pentru acțiuni economice sunt necesare:",
+        answers: ["a) volumul producției realizabile", "b) investiția totală (de realizat)", "c) rata de actualizare", "d) durata în ani a perioadei de execuție a investiției", "e) investiția de efectuat anual"],
+        correct: [0, 1] 
+      },
+      {
+        question: "La care din următorii indicatori un nivel cât mai ridicat exprimă o eficiență economică mai mare:",
+        answers: ["a) investiția specifică", "b) termenul de recuperare a investiției", "c) rata de actualizare", "d) efectul (negativ al) imobilizării fondurilor financiare investite", "e) profitul actualizat", "f) venitul net actualizat"],
+        correct: [4, 5]
+      },
+      {
+        question: "Sistemul german (Bismarck) de finanțare a sănătății se caracterizează prin:",
+        answers: ["a) finanțarea integrală de către stat a ocrotirii sănătății", "b) finanțarea din bugetul de stat a programelor publice de prevenire a îmbolnăvirilor", "c) apariția unui terț plătitor între prestatorii de servicii medicale și beneficiarii acestora", "d) plata unor cotizații corelate cu riscul personal de îmbolnăvire de către angajați și angajatori"],
+        correct: [1, 2]
+      },
+      {
+        question: "În concepția lui Paul Samuelson asupra rolului cheltuielilor publice:",
+        answers: ["a) la o creștere a venitului, consumul unui individ va crește în aceeași măsură", "b) cheltuielile publice reprezintă un stabilizator încorporat în mecanismul sistemelor economice", "c) cheltuielile publice pentru investiții antrenează un efect multiplicator important asupra activităților economice", "d) cheltuielile publice sunt considerate ca mai puțin eficiente sau chiar inacceptabile în susținerea creșterii economice echilibrate"],
+        correct: [1, 2] // Deși Samuelson e cu bunurile publice, în contextul grilelor vechi se referă adesea la rolul economic activ
+      },
+      {
+        question: "Ca indicatori sintetici pentru caracterizarea dinamicii cheltuielilor publice se pot utiliza:",
+        answers: ["a) ponderea cheltuielilor publice în produsul intern brut", "b) coeficientul de elasticitate a cheltuielilor publice în raport cu produsul intern brut", "c) cheltuielile publice medii pe locuitor în dolari SUA", "d) modificarea absolută reală a cheltuielilor publice", "e) ponderea diferitelor categorii de cheltuieli publice în total cheltuieli publice"],
+        correct: [1, 3] // Dinamica = modificare în timp
+      },
+      {
+        question: "Atât în politica bugetară, cât și în politica fiscală, sunt reflectate deciziile ce vizează:",
+        answers: ["a) sistemul de impunere a veniturilor realizate de persoane fizice", "b) apelul la resurse împrumutate pentru finanțarea deficitului bugetar", "c) modalitățile de efectuare a cheltuielilor publice", "d) opțiuni asupra evoluției ofertei de monedă"],
+        correct: [0] // Impozitele sunt elementul comun principal
+      },
+      {
+        question: "Controlul ulterior, ca una din formele sub care se manifestă controlul financiar, se particularizează prin:",
+        answers: ["a) este cea mai eficientă formă de control financiar", "b) nu poate avea ca obiectiv decât eficiența operațiunilor, acestea fiind deja finalizate", "c) permite corectarea și îmbunătățirea post-operativă a soluțiilor aplicabile pentru înfăptuirea procesului", "d) permite evitarea inițierii unor operațiuni ineficiente și evitarea pierderilor aferente lor"],
+        correct: [2]
+      },
+      {
+        question: "La care din următoarele categorii de cheltuieli publice, printre sursele de finanțare se regăsesc și contribuții ale beneficiarilor serviciilor respective:",
+        answers: ["a) cheltuieli publice cu acordarea de subvenții", "b) cheltuieli publice pentru învățământ", "c) cheltuieli publice pentru apărarea națională", "d) cheltuieli publice pentru cultură, artă, sport"],
+        correct: [1, 3] // Taxe școlare, bilete
+      },
+      {
+        question: "Mărimea subvenției acordate exportatorilor poate acoperi, în principiu, diferența între:",
+        answers: ["a) prețul cel mai redus pe piața internă și cel mai scăzut pe piața externă", "b) prețul garantat de stat și prețul de vânzare (transformat)", "c) prețul cel mai ridicat pe piața internă și cel mai scăzut pe piața externă", "d) prețurile medii obtenabile pe cele două piețe"],
+        correct: [1, 2] // Diferența de preț intern mare vs extern mic
+      },
+      {
+        question: "Între cheltuielile de funcționare efectuate pentru învățământ se încadrează:",
+        answers: ["a) cheltuielile cu salariile personalului didactic și auxiliar", "b) cheltuielile cu achiziția de materiale de laborator", "c) cheltuielile cu bursele acordate studenților", "d) cheltuielile cu achiziția de echipamente de laborator"],
+        correct: [0, 1] // Echipamentele sunt investiții (capital)
+      },
+      {
+        question: "Printre factorii demografici de influență asupra evoluției cheltuielilor publice, se numără:",
+        answers: ["a) preocuparea statului pentru o mai bună repartizare a veniturilor în societate", "b) modificările structurale ale populației pe vârste, categorii socio-profesionale", "c) creșterea duratei medii de viață", "d) acordarea de sprijin material unor categorii sociale defavorizate"],
+        correct: [1, 2]
+      },
+      {
+        question: "Având în vedere natura acțiunilor finanțate, cheltuielile publice se structurează în:",
+        answers: ["a) cheltuieli curente și de capital", "b) ordinare și extraordinare", "c) cheltuieli definitive, temporare și virtuale", "d) cheltuieli pentru prestarea serviciilor publice și cheltuieli de transfer"],
+        correct: [3] 
+      },
+      {
+        question: "În sens economic, conceptul de cheltuială publică exprimă:",
+        answers: ["a) oferta de utilități publice", "b) plăți legate de funcționarea instituțiilor publice", "c) procese economice de consum public de resurse", "d) procese și relații economice de redistribuire financiară a produsului intern brut"],
+        correct: [0, 2, 3]
+      },
+      {
+        question: "În calculul elasticității cheltuielilor publice în raport cu produsul intern brut nu intervin:",
+        answers: ["a) volumul cheltuielilor publice exprimat în prețuri curente", "b) volumul cheltuielilor publice exprimat în prețuri constante", "c) deflatorul produsului intern brut", "d) produsul intern brut exprimat în prețuri curente"],
+        correct: [1, 2] // Elasticitatea se calculează nominal
+      },
+      {
+        question: "Contractarea de împrumuturi de către autoritățile publice reprezintă o coordonată a:",
+        answers: ["a) politicii bugetare", "b) politicii finanțelor publice", "c) politicii financiar-monetare a autorităților publice", "d) politicii fiscale"],
+        correct: [0, 2]
+      },
+      {
+        question: "Reducerea efectului negativ al imobilizării fondurilor în cheltuieli de investiții se poate realiza prin:",
+        answers: ["a) eșalonarea descrescătoare a cheltuielilor de investiții", "b) eșalonarea crescătoare a cheltuielilor de investiții", "c) reducerea duratei de execuție și punere în funcțiune a obiectivului", "d) creșterea duratei de execuție și punerea în funcțiune a obiectivului"],
+        correct: [1, 2] // Cheltui puțin la început (b) și termini repede (c)
+      }
     ];
 
 
