@@ -956,8 +956,6 @@
 
       shuffledQuestions.forEach((q, index) => {
         const state = quizState[index];
-        
-        // Afișăm doar întrebările unde nu s-a luat punctaj maxim
         if (state.score < maxPointPerQ - 0.001) {
             
             let cleanQ = q.question.replace(/^\d+[\.\)]\s*/, '');
