@@ -3,7 +3,7 @@
 <html lang="ro">
 <head>
   <meta charset="UTF-8">
-  <title>MSP</title>
+  <title>DIE</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
   
@@ -372,8 +372,8 @@
       },
       {
         question: "16. Europarlamentarilor le revin următoarele obligații/drepturi:",
-        answers: ["a) plata primelor de asigurare", "b) obligația de a nu tulbura ședința parlamentară", "c) dreptul de a face propuneri legislative (indirect)"],
-        correct: [1, 2] // Selectat pe baza logicii, textul original era trunchiat
+        answers: ["a) plata primelor de asigurare datorate pentru răspunderea parlamentară", "b) obligația de a nu tulbura buna derulare a unei ședinței parlamentară", "c) obligația de a face propuneri de acte legislative în contextul dreptului de inițiativă al Parlamentului"],
+        correct: [1] // Selectat pe baza logicii, textul original era trunchiat
       },
       {
         question: "17. Președinția Consiliului are următoarele funcții esențiale:",
@@ -468,7 +468,7 @@
       {
         question: "35. Care afirmații referitoare la Tribunalul UE sunt adevărate?",
         answers: ["a) are in componență judecatori si avocați generali", "b) soluționează doar recursurile", "c) a luat ființă pe baza prevedenlor cuprinse in Actul Unic European si si-a inceput activitatea in 1989", "d) rolul avocaților generali poate fi indeplinit de orice judecător de la Tribunal, cu excepția președintelui"],
-        correct: [0, 2]
+        correct: [2, 3]
       },
       {
         question: "36. Izvoarele derivate ale Uniunii sunt:",
@@ -523,21 +523,21 @@
     ];
 
 
-// --- 1. CONFIGURARE BAZĂ DE DATE ---
-    // (Aici trebuie să fie lista ta 'const questions = [...]')
+// --- 1. CONFIGURARE (Aici rămâne lista ta) ---
+    // const questions = [ ... ]; 
     
     // --- 2. VARIABILE GLOBALE ---
     let currentQ = 0;
     let totalScore = 0;
     let streak = 0;
     
-    // Aici ținem minte ordinea amestecată a întrebărilor
-    let shuffledQuestions = [];
+    // Aici ținem lista curentă de întrebări (poate fi lista completă sau doar cele greșite)
+    let activeQuestions = [];
     
-    // Aici ținem minte ISTORICUL (ce ai răspuns, ordinea variantelor etc.)
+    // Istoricul pentru sesiunea curentă
     let quizState = []; 
 
-    // Referințe la elementele din HTML
+    // Referințe HTML
     const qText = document.getElementById("q-text");
     const qNum = document.getElementById("q-number");
     const answersList = document.getElementById("answers-list");
@@ -548,9 +548,7 @@
     const prevBtn = document.getElementById("prev-btn");
     const nextBtn = document.getElementById("next-btn");
 
-    // --- 3. FUNCȚII UTILITARE ---
-
-    // Funcția de amestecare (Fisher-Yates)
+    // --- 3. UTILITARE ---
     function shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -559,29 +557,35 @@
       return array;
     }
 
+    // --- 4. LOGICA PRINCIPALĂ ---
 
     function initQuiz() {
+      // La început, luăm TOATE întrebările
+      startRound(questions);
+    }
+
+    // Funcție generică pentru a porni o rundă (fie completă, fie de recuperare)
+    function startRound(sourceQuestions) {
       currentQ = 0;
       totalScore = 0;
       streak = 0;
       
-      // Amestecăm întrebările la început
-      shuffledQuestions = JSON.parse(JSON.stringify(questions)); 
-      shuffleArray(shuffledQuestions);
+      // Facem o copie și o amestecăm
+      activeQuestions = JSON.parse(JSON.stringify(sourceQuestions));
+      shuffleArray(activeQuestions);
 
-      // Resetăm memoria goală
-      quizState = new Array(shuffledQuestions.length).fill(null);
+      // Resetăm memoria pentru noua rundă
+      quizState = new Array(activeQuestions.length).fill(null);
       
       updateStreakUI();
       loadQuestion();
     }
 
     function loadQuestion() {
-      // Navigare butoane (activare/dezactivare)
       prevBtn.disabled = (currentQ === 0);
-      nextBtn.disabled = (currentQ === shuffledQuestions.length - 1);
+      nextBtn.disabled = (currentQ === activeQuestions.length - 1);
 
-      // Animație Timer
+      // Reset Timer
       timerBar.style.transition = "none";
       timerBar.style.transform = "scaleX(1)";
       setTimeout(() => {
@@ -589,29 +593,25 @@
         timerBar.style.transform = "scaleX(0)";
       }, 100);
 
-      // Luăm întrebarea curentă
-      const q = shuffledQuestions[currentQ];
+      const q = activeQuestions[currentQ];
       
-      // Curățăm textul întrebării de numere (ex: "1. Întrebare" -> "Întrebare")
-      let cleanQText = q.question.replace(/^\d+[\.\)]\s*/, '');
+      // Curățăm numărul din față (ex: "45. Text" -> "Text")
+      let cleanQ = q.question.replace(/^\d+[\.\)]\s*/, '');
       
-      qNum.innerText = `Întrebarea ${currentQ + 1} / ${shuffledQuestions.length}`;
-      qText.innerText = cleanQText;
+      qNum.innerText = `Întrebarea ${currentQ + 1} / ${activeQuestions.length}`;
+      qText.innerText = cleanQ;
       answersList.innerHTML = "";
 
-      // Verificăm memoria: Am mai fost aici?
       let currentState = quizState[currentQ];
 
-      // Dacă NU am mai fost, inițializăm starea pentru această întrebare
       if (!currentState) {
-        // Creăm perechi {text, indexOriginal} și le amestecăm
         let answerPairs = q.answers.map((text, idx) => ({ text: text, originalIdx: idx }));
         shuffleArray(answerPairs);
         
         currentState = {
-            answered: false,      // Încă nu s-a răspuns
-            answerOrder: answerPairs, // Memorăm ordinea asta amestecată
-            selectedIdx: [],      // Nimic selectat
+            answered: false,
+            answerOrder: answerPairs,
+            selectedIdx: [],
             score: 0,
             btnText: "VERIFICĂ",
             btnColor: "var(--accent)"
@@ -619,49 +619,41 @@
         quizState[currentQ] = currentState;
       }
 
-      // Configurăm butonul principal
       actionBtn.innerText = currentState.btnText;
       actionBtn.style.background = currentState.btnColor;
       
       if (currentState.answered) {
-          actionBtn.onclick = () => nextQuestion(); // Dacă e gata, doar treci mai departe
+          actionBtn.onclick = () => nextQuestion();
           learnBtn.style.display = "none";
       } else {
-          actionBtn.onclick = handleAction; // Dacă nu, verifică
+          actionBtn.onclick = handleAction;
           learnBtn.style.display = "block";
       }
 
-      // Generăm Răspunsurile (Litere dinamice a, b, c...)
       const letters = ['a', 'b', 'c', 'd', 'e', 'f'];
 
       currentState.answerOrder.forEach((pair, domIndex) => {
         const div = document.createElement("label");
         div.className = "answer-option";
         
-        // Curățăm textul răspunsului (scoatem a), b) vechi)
-        let cleanAnsText = pair.text.replace(/^[a-zA-Z0-9]+[\.\)]\s*/, '');
-        let newLabel = letters[domIndex] + ") ";
-
-        // Verificăm dacă a fost bifat
+        let cleanAns = pair.text.replace(/^[a-zA-Z0-9]+[\.\)]\s*/, '');
+        let label = letters[domIndex] + ") ";
         let isChecked = currentState.selectedIdx.includes(pair.originalIdx);
 
         div.innerHTML = `
           <input type="checkbox" name="ans" value="${pair.originalIdx}" ${isChecked ? "checked" : ""}>
           <div class="custom-check"></div>
-          <span class="ans-text"><b>${newLabel}</b>${cleanAnsText}</span>
+          <span class="ans-text"><b>${label}</b>${cleanAns}</span>
         `;
 
-        // Dacă s-a răspuns deja, blocăm și colorăm
         if (currentState.answered) {
             div.style.pointerEvents = "none";
             div.querySelector("input").disabled = true;
             
             const isCorrect = q.correct.includes(pair.originalIdx);
-            
             if (isCorrect) div.classList.add("correct");
             if (isChecked && !isCorrect) div.classList.add("wrong");
         } else {
-            // Dacă nu s-a răspuns, permitem click
             div.querySelector("input").addEventListener("change", function() {
               if(this.checked) div.classList.add("selected");
               else div.classList.remove("selected");
@@ -673,19 +665,16 @@
       });
     }
 
-    function handleAction() {
-      checkAnswer();
-    }
+    function handleAction() { checkAnswer(); }
 
     function checkAnswer() {
       const checked = Array.from(document.querySelectorAll('input[name="ans"]:checked'));
       if (checked.length === 0) return; 
 
       const userIdx = checked.map(c => parseInt(c.value));
-      const q = shuffledQuestions[currentQ];
+      const q = activeQuestions[currentQ];
       const correctIdx = q.correct;
 
-      // Calcul Punctaj
       let correctSelected = 0;
       let wrongSelected = 0;
 
@@ -697,12 +686,11 @@
       let ratio = (correctSelected - wrongSelected) / correctIdx.length;
       if (ratio < 0) ratio = 0;
 
-      const pointsPerQuestion = 10 / shuffledQuestions.length;
+      const pointsPerQuestion = 10 / activeQuestions.length;
       const pointsEarned = ratio * pointsPerQuestion;
       
       totalScore += pointsEarned;
 
-      // Feedback vizual buton
       let btnText = "";
       let btnColor = "";
 
@@ -710,7 +698,7 @@
         streak++;
         btnText = "CORECT! 👏";
         btnColor = "var(--correct)";
-        setTimeout(() => { if(currentQ < shuffledQuestions.length - 1) nextQuestion(); }, 1200);
+        setTimeout(() => { if(currentQ < activeQuestions.length - 1) nextQuestion(); }, 1200);
       } else {
         streak = 0;
         const pts = pointsEarned.toFixed(2);
@@ -718,44 +706,162 @@
         btnColor = ratio > 0 ? "var(--warning)" : "var(--wrong)";
       }
 
-      // SALVĂM TOT ÎN MEMORIE (Esențial pentru Review!)
       quizState[currentQ].answered = true;
       quizState[currentQ].selectedIdx = userIdx;
-      quizState[currentQ].score = pointsEarned; // Salvăm punctajul ca să știm dacă e greșit
+      quizState[currentQ].score = pointsEarned;
       quizState[currentQ].btnText = btnText;
       quizState[currentQ].btnColor = btnColor;
 
       updateStreakUI();
-      loadQuestion(); // Reîncărcăm pentru a bloca interfața
+      loadQuestion();
     }
 
     function triggerLearnMode() {
-      // Modul Învață
       quizState[currentQ].answered = true;
       quizState[currentQ].selectedIdx = [];
-      quizState[currentQ].score = 0; 
+      quizState[currentQ].score = 0;
       quizState[currentQ].btnText = "ÎNVĂȚARE";
       quizState[currentQ].btnColor = "var(--accent)";
-      
       streak = 0;
       updateStreakUI();
       loadQuestion();
     }
 
-    function prevQuestion() {
-      if (currentQ > 0) {
-        currentQ--;
-        loadQuestion();
-      }
-    }
-
+    function prevQuestion() { if (currentQ > 0) { currentQ--; loadQuestion(); } }
+    
     function nextQuestion() {
-      if (currentQ < shuffledQuestions.length - 1) {
+      if (currentQ < activeQuestions.length - 1) {
         currentQ++;
         loadQuestion();
       } else {
         showResults();
       }
+    }
+
+    // --- 5. REZULTATE ȘI RETRY (LOGICA NOUĂ) ---
+
+    function showResults() {
+      const container = document.getElementById("quiz-container");
+      const finalGrade = totalScore.toFixed(2);
+      
+      // Calculăm greșelile
+      const maxPointPerQ = 10 / activeQuestions.length;
+      // Identificăm întrebările unde nu s-a luat punctaj maxim
+      const wrongIndices = [];
+      quizState.forEach((state, index) => {
+          if (state.score < maxPointPerQ - 0.001) {
+              wrongIndices.push(index);
+          }
+      });
+      
+      const mistakesCount = wrongIndices.length;
+
+      if (mistakesCount === 0) {
+          fireConfetti(); // Doar dacă e totul perfect
+      }
+
+      let title = "";
+      let subtitle = "";
+      let retryBtnHTML = "";
+
+      if (mistakesCount === 0) {
+          title = "PERFECT! 🎉";
+          subtitle = "Ai răspuns corect la toate întrebările!";
+      } else {
+          title = `Ai ${mistakesCount} greșeli`;
+          subtitle = "Nu te lăsăm să pleci până nu le înveți!";
+          // Butonul de REPARARE
+          retryBtnHTML = `
+            <button class="btn btn-primary" id="retry-btn" onclick="retryMistakes()" style="background: var(--warning); color: #000; box-shadow: 0 4px 0 #b45309;">
+              🔄 REPARĂ CE AI GREȘIT
+            </button>
+          `;
+      }
+
+      container.innerHTML = `
+        <div class="result-view">
+          <div class="score-circle">
+            <span style="z-index:2; color:white; font-size: 2.5rem;">${finalGrade}</span>
+          </div>
+          <h1 style="margin:0;">${title}</h1>
+          <p style="color:var(--text-muted); font-size:1.2rem; margin-top:10px;">
+            ${subtitle}
+          </p>
+          
+          <div class="controls" style="margin-top:40px; flex-direction: column;">
+             ${retryBtnHTML}
+             
+             <div style="display:flex; gap:15px; width:100%; margin-top:15px;">
+                <button class="btn btn-secondary" onclick="location.href='index.html'">Meniu</button>
+                <button class="btn btn-secondary" onclick="location.reload()">Restart Total</button>
+             </div>
+          </div>
+          
+          ${mistakesCount > 0 ? `<div style="margin-top:20px;"><button class="btn btn-learn" onclick="toggleReview()">🔍 Vezi lista (${mistakesCount})</button></div>` : ''}
+          <div id="review-section"></div>
+        </div>
+      `;
+
+      // Salvăm indicii greșiți global ca să îi putem folosi în funcția de retry
+      window.lastWrongIndices = wrongIndices;
+    }
+
+    // Funcția care repornește quiz-ul DOAR cu întrebările greșite
+    function retryMistakes() {
+      // Reconstruim quiz-ul
+      const container = document.getElementById("quiz-container");
+      // Restaurăm HTML-ul original al containerului (șters de showResults)
+      container.innerHTML = `
+        <div class="timer-wrapper"><div class="timer-bar" id="timer-bar"></div></div>
+        <div class="question-card" id="question-card">
+          <div class="q-number" id="q-number">Întrebarea 1</div>
+          <p class="q-text" id="q-text">Se încarcă...</p>
+          <div class="answers-list" id="answers-list"></div>
+        </div>
+        <div class="controls">
+          <button class="btn btn-learn" id="learn-btn" onclick="triggerLearnMode()">👀 Învață</button>
+          <button class="btn btn-primary" id="action-btn" onclick="handleAction()">VERIFICĂ</button>
+        </div>
+      `;
+      
+      // Filtrăm lista de întrebări active
+      const nextRoundQuestions = window.lastWrongIndices.map(index => activeQuestions[index]);
+      
+      // Pornim runda nouă doar cu acestea
+      startRound(nextRoundQuestions);
+    }
+
+    // Funcția veche de review (opțională acum, dar bună să fie acolo)
+    function toggleReview() {
+      const reviewDiv = document.getElementById("review-section");
+      if (reviewDiv.style.display === "block") { reviewDiv.style.display = "none"; return; }
+      
+      let html = "";
+      const maxPointPerQ = 10 / activeQuestions.length;
+      const letters = ['a', 'b', 'c', 'd', 'e', 'f'];
+
+      activeQuestions.forEach((q, index) => {
+        const state = quizState[index];
+        if (state.score < maxPointPerQ - 0.001) {
+            let cleanQ = q.question.replace(/^\d+[\.\)]\s*/, '');
+            html += `<div class="review-card"><div class="review-q-title">#${index + 1}. ${cleanQ}</div>`;
+            state.answerOrder.forEach((pair, domIndex) => {
+                const originalIdx = pair.originalIdx;
+                const isCorrect = q.correct.includes(originalIdx);
+                const isSelected = state.selectedIdx.includes(originalIdx);
+                let styleClass = "review-neutral";
+                let icon = "";
+                if (isCorrect) { styleClass = "review-correct"; icon = "✅"; }
+                else if (isSelected && !isCorrect) { styleClass = "review-wrong"; icon = "❌"; }
+                let cleanAns = pair.text.replace(/^[a-zA-Z0-9]+[\.\)]\s*/, '');
+                html += `<div class="review-option ${styleClass}"><span><b>${letters[domIndex]})</b></span><span style="flex:1;">${cleanAns}</span><span>${icon}</span></div>`;
+            });
+            html += `</div>`;
+        }
+      });
+      reviewDiv.innerHTML = html;
+      reviewDiv.style.display = "block";
+      reviewDiv.scrollIntoView({ behavior: 'smooth' });
     }
 
     function updateStreakUI() {
@@ -775,106 +881,6 @@
         conf.style.animationDuration = (Math.random() * 3 + 2) + 's';
         document.body.appendChild(conf);
       }
-    }
-
-    // --- 5. LOGICA DE FINAL & REVIEW (Aici era problema ta) ---
-
-    function showResults() {
-      const container = document.getElementById("quiz-container");
-      const finalGrade = totalScore.toFixed(2);
-      
-      if(totalScore >= 5) fireConfetti();
-      
-      let msg = "";
-      if (totalScore >= 9) msg = "Excelent! 🌟";
-      else if (totalScore >= 7) msg = "Foarte bine! 👏";
-      else if (totalScore >= 5) msg = "Ai trecut! 👍";
-      else msg = "Mai exersează! 📉";
-
-      const maxPointPerQ = 10 / shuffledQuestions.length;
-      const mistakes = quizState.filter(s => s.score < maxPointPerQ - 0.001).length;
-
-      let reviewBtnHTML = "";
-      if (mistakes > 0) {
-        reviewBtnHTML = `<button class="btn btn-learn" onclick="toggleReview()" style="margin-top:15px; font-size:0.9rem;">🔍 Vezi Greșelile (${mistakes})</button>`;
-      }
-
-      container.innerHTML = `
-        <div class="result-view">
-          <div class="score-circle">
-            <span style="z-index:2; color:white; font-size: 2.5rem;">${finalGrade}</span>
-          </div>
-          <h1 style="margin:0;">${msg}</h1>
-          <p style="color:var(--text-muted); font-size:1.2rem; margin-top:10px;">
-            Nota finală: ${finalGrade} din 10
-          </p>
-          
-          <div class="controls" style="margin-top:30px; flex-wrap:wrap;">
-             <button class="btn btn-secondary" onclick="location.href='index.html'">Meniu</button>
-             <button class="btn btn-primary" onclick="location.reload()">Din Nou</button>
-          </div>
-          
-          ${reviewBtnHTML}
-
-          <div id="review-section"></div>
-        </div>
-      `;
-    }
-    function toggleReview() {
-      const reviewDiv = document.getElementById("review-section");
-      if (reviewDiv.style.display === "block") {
-          reviewDiv.style.display = "none";
-          return;
-      }
-      let html = "";
-      const maxPointPerQ = 10 / shuffledQuestions.length;
-      const letters = ['a', 'b', 'c', 'd', 'e', 'f'];
-
-      shuffledQuestions.forEach((q, index) => {
-        const state = quizState[index];
-        if (state.score < maxPointPerQ - 0.001) {
-            
-            let cleanQ = q.question.replace(/^\d+[\.\)]\s*/, '');
-
-            html += `<div class="review-card">
-              <div class="review-q-title">#${index + 1}. ${cleanQ}</div>`;
-            state.answerOrder.forEach((pair, domIndex) => {
-                const originalIdx = pair.originalIdx;
-                const isCorrect = q.correct.includes(originalIdx);
-                const isSelected = state.selectedIdx.includes(originalIdx);
-                
-                let styleClass = "review-neutral";
-                let icon = "";
-
-                if (isCorrect) {
-                    styleClass = "review-correct"; // Verde
-                    icon = "✅"; 
-                } else if (isSelected && !isCorrect) {
-                    styleClass = "review-wrong"; // Roșu
-                    icon = "❌";
-                }
-
-                let userMark = isSelected ? "(Ales de tine)" : "";
-                let cleanAns = pair.text.replace(/^[a-zA-Z0-9]+[\.\)]\s*/, '');
-
-                html += `
-                  <div class="review-option ${styleClass}">
-                    <span><b>${letters[domIndex]})</b></span>
-                    <span style="flex:1;">${cleanAns} <small style="opacity:0.7;">${userMark}</small></span>
-                    <span>${icon}</span>
-                  </div>
-                `;
-            });
-
-            html += `</div>`;
-        }
-      });
-
-      reviewDiv.innerHTML = html;
-      reviewDiv.style.display = "block";
-      
-      // Scroll automat până la secțiunea de review
-      reviewDiv.scrollIntoView({ behavior: 'smooth' });
     }
 
     // Pornire
