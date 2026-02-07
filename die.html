@@ -367,7 +367,7 @@
       },
       {
         question: "15. Normele dreptului UE prevăd următoarele tipuri de proceduri în fața Curții de Justiție:",
-        answers: ["a) recursul și apelul subiecților privați (limitat)", "b) acțiunea în constatarea îndeplinirii obligațiilor (infringement)", "c) procedura întrebărilor preliminare"],
+        answers: ["a) recursul și apelul subiecților privați (cetățenilor și rezidenților europeni)", "b) acțiunea în constatarea îndeplinirii obligațiilor", "c) procedura întrebărilor preliminare"],
         correct: [2]
       },
       {
@@ -581,7 +581,20 @@
       loadQuestion();
     }
 
-    function loadQuestion() {
+      function loadQuestion() {
+      // --- RE-SELECTARE ELEMENTE (CRITIC PENTRU RETRY) ---
+      const qText = document.getElementById("q-text");
+      const qNum = document.getElementById("q-number");
+      const answersList = document.getElementById("answers-list");
+      const actionBtn = document.getElementById("action-btn");
+      const learnBtn = document.getElementById("learn-btn");
+      const timerBar = document.getElementById("timer-bar");
+      const prevBtn = document.getElementById("prev-btn");
+      const nextBtn = document.getElementById("next-btn");
+      // ----------------------------------------------------
+
+      prevBtn.disabled = (currentQ === 0);
+      nextBtn.disabled = (currentQ === activeQuestions.length - 1);
       prevBtn.disabled = (currentQ === 0);
       nextBtn.disabled = (currentQ === activeQuestions.length - 1);
 
@@ -740,24 +753,30 @@
 
     // --- 5. REZULTATE ȘI RETRY (LOGICA NOUĂ) ---
 
-    function showResults() {
+function showResults() {
       const container = document.getElementById("quiz-container");
       const finalGrade = totalScore.toFixed(2);
       
-      // Calculăm greșelile
+      // 1. Identificăm greșelile
       const maxPointPerQ = 10 / activeQuestions.length;
-      // Identificăm întrebările unde nu s-a luat punctaj maxim
-      const wrongIndices = [];
+      
+      // Salvăm obiectele complete ale întrebărilor greșite
+      const wrongQuestionsList = [];
+      
       quizState.forEach((state, index) => {
+          // Dacă scorul e mai mic decât maximul (cu o marjă de eroare)
           if (state.score < maxPointPerQ - 0.001) {
-              wrongIndices.push(index);
+              wrongQuestionsList.push(activeQuestions[index]);
           }
       });
       
-      const mistakesCount = wrongIndices.length;
+      const mistakesCount = wrongQuestionsList.length;
+
+      // Salvăm lista global ca să o folosim la retry
+      window.wrongQuestionsCache = wrongQuestionsList;
 
       if (mistakesCount === 0) {
-          fireConfetti(); // Doar dacă e totul perfect
+          fireConfetti();
       }
 
       let title = "";
@@ -770,9 +789,8 @@
       } else {
           title = `Ai ${mistakesCount} greșeli`;
           subtitle = "Nu te lăsăm să pleci până nu le înveți!";
-          // Butonul de REPARARE
           retryBtnHTML = `
-            <button class="btn btn-primary" id="retry-btn" onclick="retryMistakes()" style="background: var(--warning); color: #000; box-shadow: 0 4px 0 #b45309;">
+            <button class="btn btn-primary" id="retry-btn" onclick="retryMistakes()" style="background: var(--warning); color: #000; box-shadow: 0 4px 0 #b45309; margin-bottom: 15px;">
               🔄 REPARĂ CE AI GREȘIT
             </button>
           `;
@@ -791,7 +809,7 @@
           <div class="controls" style="margin-top:40px; flex-direction: column;">
              ${retryBtnHTML}
              
-             <div style="display:flex; gap:15px; width:100%; margin-top:15px;">
+             <div style="display:flex; gap:15px; width:100%;">
                 <button class="btn btn-secondary" onclick="location.href='index.html'">Meniu</button>
                 <button class="btn btn-secondary" onclick="location.reload()">Restart Total</button>
              </div>
@@ -801,37 +819,40 @@
           <div id="review-section"></div>
         </div>
       `;
-
-      // Salvăm indicii greșiți global ca să îi putem folosi în funcția de retry
-      window.lastWrongIndices = wrongIndices;
     }
 
-    // Funcția care repornește quiz-ul DOAR cu întrebările greșite
-    function retryMistakes() {
-      // Reconstruim quiz-ul
+function retryMistakes() {
+      // Verificăm dacă avem greșeli salvate
+      if (!window.wrongQuestionsCache || window.wrongQuestionsCache.length === 0) {
+          alert("Nu au fost găsite greșeli de reparat.");
+          return;
+      }
+
+      // Reconstruim HTML-ul pentru quiz (că a fost șters de rezultate)
       const container = document.getElementById("quiz-container");
-      // Restaurăm HTML-ul original al containerului (șters de showResults)
       container.innerHTML = `
         <div class="timer-wrapper"><div class="timer-bar" id="timer-bar"></div></div>
+        
         <div class="question-card" id="question-card">
           <div class="q-number" id="q-number">Întrebarea 1</div>
           <p class="q-text" id="q-text">Se încarcă...</p>
           <div class="answers-list" id="answers-list"></div>
         </div>
+
         <div class="controls">
           <button class="btn btn-learn" id="learn-btn" onclick="triggerLearnMode()">👀 Învață</button>
           <button class="btn btn-primary" id="action-btn" onclick="handleAction()">VERIFICĂ</button>
         </div>
       `;
       
-      // Filtrăm lista de întrebări active
-      const nextRoundQuestions = window.lastWrongIndices.map(index => activeQuestions[index]);
+      // Re-conectăm variabilele UI la noile elemente create
+      // (FOARTE IMPORTANT: Altfel codul vechi încearcă să scrie în elemente care nu mai există)
+      // Nota: Le re-selectăm local sau actualizăm referințele globale, dar cel mai sigur e să le luăm din nou în loadQuestion
+      // Totuși, pentru simplitate, să ne asigurăm că startRound le găsește.
       
-      // Pornim runda nouă doar cu acestea
-      startRound(nextRoundQuestions);
+      // Pornim runda cu lista de greșeli salvată
+      startRound(window.wrongQuestionsCache);
     }
-
-    // Funcția veche de review (opțională acum, dar bună să fie acolo)
     function toggleReview() {
       const reviewDiv = document.getElementById("review-section");
       if (reviewDiv.style.display === "block") { reviewDiv.style.display = "none"; return; }
